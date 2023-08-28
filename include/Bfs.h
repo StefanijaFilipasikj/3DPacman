@@ -23,6 +23,10 @@ class BFS {
     vector<list<int> > adj;
 
 public:
+    BFS(){
+        this->V = 0;
+        adj.resize(V);
+    };
     // Constructor
     BFS(int V){
         this->V = V;

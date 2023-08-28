@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include "Maze.h"
 #include "Bfs.h"
+#include "Ghost.h"
 
 #include <iostream>
 #include <cmath>
@@ -14,6 +15,8 @@ const std::string program_name = ("GLSL shaders & uniforms");
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+void loadWalls(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation);
+void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4, glm::mat4 &model, unsigned int modelLoc) ;
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -223,19 +226,24 @@ int main()
     maze.generateMaze();
     maze.printMaze();
 
-    BFS bfs = BFS(rows*cols);
-    vector<int> path = bfs.get_path(0, 17);
+    Ghost ghost1 = Ghost(glm::vec3(0.0f,0.0f,0.0f), cols*rows);
+    Ghost ghost2 = Ghost(glm::vec3(cols-1,0.0f,rows-1), cols*rows);
+    Ghost ghost3 = Ghost(glm::vec3(cols-1,0.0f,0.0f), cols*rows);
+    Ghost ghost4 = Ghost(glm::vec3(0.0f,0.0f,rows-1), cols*rows);
+    /*BFS bfs = BFS(rows*cols);
+    vector<int> path = bfs.get_path(0, 17);*/
 
     int x=0;
     int z=0;
     float time = 0;
+    float ghostMoveSpeed = 3.0f;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
         glfwSetCursorPosCallback(window, mouse_callback);
 
-        path = bfs.get_path(x+z*cols, glm::floor(cameraPos.x)+glm::floor(cameraPos.z)*cols);
+        //path = bfs.get_path(x+z*cols, glm::floor(cameraPos.x)+glm::floor(cameraPos.z)*cols);
 
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -244,9 +252,6 @@ int main()
         //matrices
         glm::mat4 model = glm::mat4(1.0f);
         //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(60.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-        float yaw = -90.0f;
-        float pitch = 0.0f;
 
         //cameraPos + cameraFront
         view = glm::lookAt(cameraPos, cameraFront + cameraPos, cameraUp);
@@ -284,79 +289,19 @@ int main()
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // render the triangle
+        //color uniform
         int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f,  0.0f, 0.0f, 1.0f);
 
+        // render the floor
+        glUniform4f(vertexColorLocation, 0.0f,  0.0f, 0.0f, 1.0f);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-
-
-        //load maze
-        glUniform4f(vertexColorLocation, 0.0f,  0.75f, 1.0f, 1.0f);
-        for(int i=0;i<rows;i++){
-            for(int j=0;j<cols;j++){
-                if(grid[i][j].wallRight){
-                    model = glm::mat4(1.0f);
-                    model = glm::translate(model, glm::vec3((float)(j+1), 0, (float)i));
-                    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-                    glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
-                }
-                if(grid[i][j].wallLeft){
-                    model = glm::mat4(1.0f);
-                    model = glm::translate(model, glm::vec3((float)(j), 0, (float)i));
-                    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-                    glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
-                }
-                if(grid[i][j].wallUp){
-                    model = glm::mat4(1.0f);
-                    model = glm::translate(model, glm::vec3((float)(j)+0.2f, 0, (float)i+0.2));
-                    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
-                    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-                    glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
-                }
-            }
-        }
-        for(int j=0;j<cols;j++){
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3((float)(j)+0.2f, 0, rows));
-            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-            glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
-            glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
-            glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
-        }
+        //load walls
+        loadWalls(model, modelLoc, vertexColorLocation);
 
         //load ghost
-        glUniform4f(vertexColorLocation, 1.0f,  0.0f, 0.0f, 1.0f);
-        model = glm::mat4(1.0f);
 
-
-        time += deltaTime;
-        if(time>=1){
-            time=0;
-            cout<<"("<<glm::floor(cameraPos.x)<<", "<<glm::floor(cameraPos.z)<<") ";
-            int num;
-            if(path.size() != 0){
-                num = path[0];
-                path.erase(path.begin());
-            }
-
-            x = num % cols;
-            z = num / cols;
-        }
-
-        model = glm::translate(model, glm::vec3((float) x + 0.3f, 0.0f, (float)z + 0.3f));
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
-        glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
-        glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+        loadGhost(vertexColorLocation, ghost1, ghost2, ghost3, ghost4, model, modelLoc);
 
         //glDrawArrays(GL_TRIANGLE_STRIP, num_angles*2+2,4);
 
@@ -375,6 +320,87 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
+}
+
+void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4, glm::mat4 &model, unsigned int modelLoc) {
+    //red
+    glUniform4f(vertexColorLocation, 1.0f,  0.0f, 0.0f, 1.0f);
+    model = glm::mat4(1.0f);
+    ghost1.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
+    model = glm::translate(model, glm::vec3( ghost1.position.x + 0.3f, 0.0f, ghost1.position.z + 0.3f));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
+    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+    //blue
+    glUniform4f(vertexColorLocation, 0.0f,  0.0f, 1.0f, 1.0f);
+    model = glm::mat4(1.0f);
+    ghost2.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
+    model = glm::translate(model, glm::vec3( ghost2.position.x + 0.3f, 0.0f, ghost2.position.z + 0.3f));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
+    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+    //green
+    glUniform4f(vertexColorLocation, 0.0f,  1.0f, 0.0f, 1.0f);
+    model = glm::mat4(1.0f);
+    ghost3.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
+    model = glm::translate(model, glm::vec3( ghost3.position.x + 0.3f, 0.0f, ghost3.position.z + 0.3f));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
+    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+    //yellow
+    glUniform4f(vertexColorLocation, 0.0f,  1.0f, 1.0f, 1.0f);
+    model = glm::mat4(1.0f);
+    ghost4.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
+    model = glm::translate(model, glm::vec3( ghost4.position.x + 0.3f, 0.0f, ghost4.position.z + 0.3f));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
+    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+}
+
+void loadWalls(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation) {
+    glUniform4f(vertexColorLocation, 0.0f, 0.75f, 1.0f, 1.0f);
+    for(int i=0;i<rows;i++){
+        for(int j=0;j<cols;j++){
+            if(grid[i][j].wallRight){
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3((float)(j+1), 0, (float)i));
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
+                glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
+                glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
+            }
+            if(grid[i][j].wallLeft){
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3((float)(j), 0, (float)i));
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
+                glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
+                glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
+            }
+            if(grid[i][j].wallUp){
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3((float)(j)+0.2f, 0, (float)i+0.2));
+                model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
+                glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
+                glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
+            }
+        }
+    }
+    for(int j=0;j<cols;j++){
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3((float)(j)+0.2f, 0, rows));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
+        glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
+    }
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
