@@ -1,9 +1,9 @@
 
-if (NOT EXISTS "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug/vendor/glfw/install_manifest.txt")
-  message(FATAL_ERROR "Cannot find install manifest: \"C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug/vendor/glfw/install_manifest.txt\"")
+if (NOT EXISTS "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug/vendor/glfw/install_manifest.txt")
+  message(FATAL_ERROR "Cannot find install manifest: \"C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug/vendor/glfw/install_manifest.txt\"")
 endif()
 
-file(READ "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug/vendor/glfw/install_manifest.txt" files)
+file(READ "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug/vendor/glfw/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
 foreach (file ${files})

@@ -67,7 +67,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug"
+			"value" : "c:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -671,7 +671,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -755,7 +755,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman"
+			"value" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1399,7 +1399,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug/vendor/glfw"
+			"value" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug/vendor/glfw"
 		},
 		{
 			"name" : "GLFW_BUILD_DOCS",
@@ -1471,7 +1471,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glfw"
+			"value" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw"
 		},
 		{
 			"name" : "GLFW_USE_HYBRID_HPG",
@@ -1519,7 +1519,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug"
+			"value" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug"
 		},
 		{
 			"name" : "OpenGLPrj_IS_TOP_LEVEL",
@@ -1543,7 +1543,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman"
+			"value" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman"
 		},
 		{
 			"name" : "VULKAN_INCLUDE_DIR",

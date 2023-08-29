@@ -52,10 +52,10 @@ RM = "C:\Program Files\JetBrains\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe"
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\drist\Desktop\Github\Unity\3D-Pacman
+CMAKE_SOURCE_DIR = C:\Users\drist\Desktop\Github\Opengl\3D-Pacman
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug
+CMAKE_BINARY_DIR = C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug
 
 # Utility rule file for uninstall.
 
@@ -66,7 +66,7 @@ include vendor/glfw/CMakeFiles/uninstall.dir/compiler_depend.make
 include vendor/glfw/CMakeFiles/uninstall.dir/progress.make
 
 vendor/glfw/CMakeFiles/uninstall:
-	cd /d C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug\vendor\glfw && "C:\Program Files\JetBrains\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe" -P C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug/vendor/glfw/cmake_uninstall.cmake
+	cd /d C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug\vendor\glfw && "C:\Program Files\JetBrains\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe" -P C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug/vendor/glfw/cmake_uninstall.cmake
 
 uninstall: vendor/glfw/CMakeFiles/uninstall
 uninstall: vendor/glfw/CMakeFiles/uninstall.dir/build.make
@@ -77,10 +77,10 @@ vendor/glfw/CMakeFiles/uninstall.dir/build: uninstall
 .PHONY : vendor/glfw/CMakeFiles/uninstall.dir/build
 
 vendor/glfw/CMakeFiles/uninstall.dir/clean:
-	cd /d C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug\vendor\glfw && $(CMAKE_COMMAND) -P CMakeFiles\uninstall.dir\cmake_clean.cmake
+	cd /d C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug\vendor\glfw && $(CMAKE_COMMAND) -P CMakeFiles\uninstall.dir\cmake_clean.cmake
 .PHONY : vendor/glfw/CMakeFiles/uninstall.dir/clean
 
 vendor/glfw/CMakeFiles/uninstall.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\drist\Desktop\Github\Unity\3D-Pacman C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glfw C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug\vendor\glfw C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug\vendor\glfw\CMakeFiles\uninstall.dir\DependInfo.cmake --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\drist\Desktop\Github\Opengl\3D-Pacman C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glfw C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug\vendor\glfw C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug\vendor\glfw\CMakeFiles\uninstall.dir\DependInfo.cmake --color=$(COLOR)
 .PHONY : vendor/glfw/CMakeFiles/uninstall.dir/depend
 

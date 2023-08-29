@@ -3,13 +3,13 @@
 
 # compile C with C:/Program Files/JetBrains/CLion 2022.3.2/bin/mingw/bin/gcc.exe
 # compile CXX with C:/Program Files/JetBrains/CLion 2022.3.2/bin/mingw/bin/g++.exe
-C_DEFINES = -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Unity/3D-Pacman\"
+C_DEFINES = -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Opengl/3D-Pacman\"
 
 C_INCLUDES = @CMakeFiles/OpenGLPrj.dir/includes_C.rsp
 
 C_FLAGS = -g -fdiagnostics-color=always
 
-CXX_DEFINES = -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Unity/3D-Pacman\"
+CXX_DEFINES = -DGLFW_INCLUDE_NONE -DPROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Opengl/3D-Pacman\"
 
 CXX_INCLUDES = @CMakeFiles/OpenGLPrj.dir/includes_CXX.rsp
 

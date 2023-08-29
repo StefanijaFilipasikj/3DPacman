@@ -1,8 +1,8 @@
 vendor/glfw/src/CMakeFiles/glfw.dir/win32_monitor.c.obj: \
- C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glfw\src\win32_monitor.c \
- C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glfw\src\internal.h \
- C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug/vendor/glfw/src/glfw_config.h \
- C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glfw/include/GLFW/glfw3.h \
+ C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glfw\src\win32_monitor.c \
+ C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glfw\src\internal.h \
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug/vendor/glfw/src/glfw_config.h \
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/include/GLFW/glfw3.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/stddef.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/stddef.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/crtdefs.h \
@@ -14,7 +14,7 @@ vendor/glfw/src/CMakeFiles/glfw.dir/win32_monitor.c.obj: \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/stdint.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/stdint.h \
- C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glfw\src\win32_platform.h \
+ C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glfw\src\win32_platform.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/wctype.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/windows.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/sdkddkver.h \
@@ -224,7 +224,7 @@ vendor/glfw/src/CMakeFiles/glfw.dir/win32_monitor.c.obj: \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/_mingw_dxhelper.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/xinput.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/dbt.h \
- C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glfw\src\win32_joystick.h \
- C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glfw\src\wgl_context.h \
- C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glfw\src\egl_context.h \
- C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glfw\src\osmesa_context.h
+ C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glfw\src\win32_joystick.h \
+ C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glfw\src\wgl_context.h \
+ C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glfw\src\egl_context.h \
+ C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glfw\src\osmesa_context.h

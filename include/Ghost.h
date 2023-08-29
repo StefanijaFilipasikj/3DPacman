@@ -16,8 +16,11 @@ private:
     glm::vec3 moveTo;
     glm::vec3 algPosition;
     vector<int> path;
+
 public:
     glm::vec3 position;
+    bool isScared;
+
     Ghost(glm::vec3 pos, int V){
         moveSpeed = 10.0f;
         algPosition = pos;
@@ -25,10 +28,10 @@ public:
         moved = 1;
         position = pos;
         algorithm = BFS(V);
+        isScared=false;
     }
 
     void move(float deltaTime, int dest){
-
         if(path.size()!=0){
             int dest_X = path[0]%cols;
             int dest_Z = path[0]/cols;
@@ -45,7 +48,13 @@ public:
             algPosition = moveTo;
             position = moveTo;
             moved = 0;
-            path = algorithm.get_path(algPosition.x + algPosition.z*cols, dest);
+            if(!isScared){
+                path = algorithm.get_path(algPosition.x + algPosition.z*cols, dest);
+            }else{
+                path = vector<int>();
+                path.push_back(algorithm.getRunningPath(algPosition.x + algPosition.z*cols,dest));
+            }
+
         }
     }
 };

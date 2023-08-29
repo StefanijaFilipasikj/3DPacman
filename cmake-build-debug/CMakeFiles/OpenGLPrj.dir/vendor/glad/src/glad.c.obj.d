@@ -1,5 +1,5 @@
 CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj: \
- C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glad\src\glad.c \
+ C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glad\src\glad.c \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/stdio.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/corecrt.h \
@@ -14,7 +14,7 @@ CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj: \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/string.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/crtdefs.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/sec_api/string_s.h \
- C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glad/include/glad/glad.h \
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/include/glad/glad.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/windows.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/sdkddkver.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/excpt.h \
@@ -195,7 +195,7 @@ CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj: \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/winsvc.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/mcx.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/imm.h \
- C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glad/include/KHR/khrplatform.h \
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/include/KHR/khrplatform.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/stdint.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/stdint.h \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/x86_64-w64-mingw32/include/inttypes.h

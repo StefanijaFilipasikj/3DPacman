@@ -36,6 +36,7 @@ public:
                 grid[i][j].wallDown = true;
                 grid[i][j].wallLeft = true;
                 grid[i][j].wallRight = true;
+                grid[i][j].hasCoin = true;
             }
         }
     }
@@ -44,7 +45,6 @@ public:
     }
 
     bool isValid(int row, int col) {
-        //return (row >= 0 && row < rows && col >= 0 && col < cols);
         return (row >= 0 && row < rows && col >= 0 && col < cols && !grid[row][col].visited);
     }
 
@@ -65,8 +65,6 @@ public:
         int startRow = rand() % rows;
         int startCol = rand() % cols;
 
-        //cout<<"Start: "<<startCol<<" "<<startRow<<endl;
-
         grid[startRow][startCol].visited = true;
         vector<pair<int, int>> walls;
 
@@ -75,12 +73,6 @@ public:
         if (isValid(startRow, startCol - 1)) walls.push_back(make_pair(startRow, startCol - 1));
         if (isValid(startRow, startCol + 1)) walls.push_back(make_pair(startRow, startCol + 1));
 
-        /*cout<<"Walls: ";
-        for(pair<int,int>n : walls){
-            cout<<" "<<n.second<<","<<n.first<<" ";
-        }
-        cout<<endl;*/
-
         while (!walls.empty()) {
             //choose a wall
             int randomIndex = rand() % walls.size();
@@ -88,7 +80,6 @@ public:
             int currentCol = walls[randomIndex].second;
             grid[currentRow][currentCol].visited = true;
 
-            //cout<<"Current: "<<currentCol<<","<<currentRow<<"    ";
             //for choosing the visited wall
             vector<pair<int, int>> neighbors;
 
@@ -97,44 +88,59 @@ public:
             if (isVisited(currentRow + 1, currentCol)) neighbors.push_back(make_pair(currentRow + 1, currentCol));
             if (isVisited(currentRow, currentCol - 1)) neighbors.push_back(make_pair(currentRow, currentCol - 1));
             if (isVisited(currentRow, currentCol + 1)) neighbors.push_back(make_pair(currentRow, currentCol + 1));
-            /*cout<<"Neighbors:";
-            for(pair<int,int>n : neighbors){
-                cout<<" "<<n.second<<","<<n.first<<" ";
-            }
-            cout<<endl;*/
+
             //pick a random wall to connect to
             if (!neighbors.empty()) {
-                int randomNeighborIndex = rand() % neighbors.size();
-                int neighborRow = neighbors[randomNeighborIndex].first;
-                int neighborCol = neighbors[randomNeighborIndex].second;
+                //randomly connect to 2 walls
+                int br = rand() % 100;
+                if(br >= 30){
+                    if(neighbors.size() > 1){
+                        for(int i=0;i<2;i++){
+                            int randomNeighborIndex = rand() % neighbors.size();
+                            int neighborRow = neighbors[randomNeighborIndex].first;
+                            int neighborCol = neighbors[randomNeighborIndex].second;
 
-                if (neighborRow == currentRow - 1) {
-                    grid[currentRow][currentCol].wallUp = false;
-                    grid[neighborRow][neighborCol].wallDown = false;
-                } else if (neighborRow == currentRow + 1) {
-                    grid[currentRow][currentCol].wallDown = false;
-                    grid[neighborRow][neighborCol].wallUp = false;
-                } else if (neighborCol == currentCol - 1) {
-                    grid[currentRow][currentCol].wallLeft = false;
-                    grid[neighborRow][neighborCol].wallRight = false;
-                } else if (neighborCol == currentCol + 1) {
-                    grid[currentRow][currentCol].wallRight = false;
-                    grid[neighborRow][neighborCol].wallLeft = false;
+                            addNeighbor(currentRow, currentCol, neighborRow, neighborCol);
+                            neighbors.erase(neighbors.begin() + randomNeighborIndex);
+                        }
+                    }else{
+                        int randomNeighborIndex = rand() % neighbors.size();
+                        int neighborRow = neighbors[randomNeighborIndex].first;
+                        int neighborCol = neighbors[randomNeighborIndex].second;
+
+                        addNeighbor(currentRow, currentCol, neighborRow, neighborCol);
+                    }
+                }else{
+                    int randomNeighborIndex = rand() % neighbors.size();
+                    int neighborRow = neighbors[randomNeighborIndex].first;
+                    int neighborCol = neighbors[randomNeighborIndex].second;
+
+                    addNeighbor(currentRow, currentCol, neighborRow, neighborCol);
                 }
-
-                //grid[neighborRow][neighborCol].visited = true;
-
-                /*if (isValid(neighborRow - 1, neighborCol)) walls.push_back(make_pair(neighborRow - 1, neighborCol));
-                if (isValid(neighborRow + 1, neighborCol)) walls.push_back(make_pair(neighborRow + 1, neighborCol));
-                if (isValid(neighborRow, neighborCol - 1)) walls.push_back(make_pair(neighborRow, neighborCol - 1));
-                if (isValid(neighborRow, neighborCol + 1)) walls.push_back(make_pair(neighborRow, neighborCol + 1));*/
             }
             walls.erase(walls.begin() + randomIndex);
+
             //add all new unvisited walls
             if (isValid(currentRow - 1, currentCol) && !contains(walls,currentRow - 1, currentCol)) walls.push_back(make_pair(currentRow - 1, currentCol));
             if (isValid(currentRow + 1, currentCol) && !contains(walls,currentRow + 1, currentCol)) walls.push_back(make_pair(currentRow + 1, currentCol));
             if (isValid(currentRow, currentCol - 1) && !contains(walls,currentRow, currentCol-1)) walls.push_back(make_pair(currentRow, currentCol - 1));
             if (isValid(currentRow, currentCol + 1) && !contains(walls,currentRow, currentCol+1)) walls.push_back(make_pair(currentRow, currentCol + 1));
+        }
+    }
+
+    void addNeighbor(int currentRow, int currentCol, int neighborRow, int neighborCol) const {
+        if (neighborRow == currentRow - 1) {
+            grid[currentRow][currentCol].wallUp = false;
+            grid[neighborRow][neighborCol].wallDown = false;
+        } else if (neighborRow == currentRow + 1) {
+            grid[currentRow][currentCol].wallDown = false;
+            grid[neighborRow][neighborCol].wallUp = false;
+        } else if (neighborCol == currentCol - 1) {
+            grid[currentRow][currentCol].wallLeft = false;
+            grid[neighborRow][neighborCol].wallRight = false;
+        } else if (neighborCol == currentCol + 1) {
+            grid[currentRow][currentCol].wallRight = false;
+            grid[neighborRow][neighborCol].wallLeft = false;
         }
     }
 
@@ -144,8 +150,6 @@ public:
                 cout << "+";
                 if (grid[i][j].wallUp) cout << "-";
                 else cout << " ";
-                /*cout<<"("<<i<<","<<j<<")"<<"   ";
-                cout<<grid[i][j].wallLeft<<grid[i][j].wallUp<<grid[i][j].wallRight<<grid[i][j].wallDown<<endl;*/
 
             }
             cout << "+" << endl;

@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glfw/src
+# Install script for directory: C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,6 +38,6 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug/vendor/glfw/src/libglfw3.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug/vendor/glfw/src/libglfw3.a")
 endif()
 

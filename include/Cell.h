@@ -10,7 +10,7 @@ public:
     int row, col;
     bool visited;
     bool wallUp, wallDown, wallLeft, wallRight;
-
+    bool hasCoin;
     int numWalls(){
         int num=0;
         if(wallUp) num++;

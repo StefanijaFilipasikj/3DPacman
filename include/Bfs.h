@@ -20,7 +20,17 @@ class BFS {
     int V;
 
     // Pointer to an array containing adjacency lists
-    vector<list<int> > adj;
+    vector<vector<int> > adj;
+
+    int maxElement(vector<int> list){
+        int max = 0;
+        for(int i=1;i<list.size();i++){
+            if(list[i] > list[max]){
+                max = i;
+            }
+        }
+        return max;
+    }
 
 public:
     BFS(){
@@ -54,6 +64,24 @@ public:
             }
            // cout<<endl;
         }
+    }
+
+    int getRunningPath(int src, int pacman){
+        int src_x = src%cols;
+        int src_z = src/cols;
+        int pac_x = pacman%cols;
+        int pac_z = pacman/cols;
+        vector<int> distances;
+        for(int cord : adj[src]){
+            int x = cord%cols;
+            int z = cord/cols;
+            int dist = glm::abs(pac_x-x) + glm::abs(pac_z-z);
+            distances.push_back(dist);
+        }
+        int next = adj[src][maxElement(distances)];
+        if(distances[maxElement(distances)] <= glm::abs(pac_x-src_x)+glm::abs(pac_z-src_z))
+            return src;
+        return next;
     }
 
     bool isValid(int row, int col){

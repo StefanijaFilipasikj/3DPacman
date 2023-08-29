@@ -98,14 +98,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "OpenGLPrj::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-OpenGLPrj-Debug-2fa2f01ba4017def24f2.json",
+					"jsonFile" : "target-OpenGLPrj-Debug-c0f69aec8038a625ac6d.json",
 					"name" : "OpenGLPrj",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 2,
 					"id" : "glfw::@31bd9730e6b8c71cc656",
-					"jsonFile" : "target-glfw-Debug-52d622abbd6c825f43dd.json",
+					"jsonFile" : "target-glfw-Debug-d772f8bacdd5de9e8edf.json",
 					"name" : "glfw",
 					"projectIndex" : 1
 				},
@@ -122,8 +122,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug",
-		"source" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman"
+		"build" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug",
+		"source" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman"
 	},
 	"version" : 
 	{

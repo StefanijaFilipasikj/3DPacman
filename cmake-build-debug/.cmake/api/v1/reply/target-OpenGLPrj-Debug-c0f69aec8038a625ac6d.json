@@ -70,30 +70,30 @@
 				},
 				{
 					"backtrace" : 3,
-					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Unity/3D-Pacman\""
+					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Opengl/3D-Pacman\""
 				}
 			],
 			"includes" : 
 			[
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/include"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glad/include"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/include"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glfw/include"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/include"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glm"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/stb"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/stb"
 				}
 			],
 			"language" : "CXX",
@@ -117,30 +117,30 @@
 				},
 				{
 					"backtrace" : 3,
-					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Unity/3D-Pacman\""
+					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Opengl/3D-Pacman\""
 				}
 			],
 			"includes" : 
 			[
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/include"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glad/include"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/include"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glfw/include"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/include"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glm"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/stb"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/stb"
 				}
 			],
 			"language" : "C",

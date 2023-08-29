@@ -45,6 +45,8 @@ glm::vec3 cameraPos   = glm::vec3(5.0f, 20.0f,  5.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
+int points = 0;
+
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
@@ -127,28 +129,28 @@ int main()
     // ------------------------------------------------------------------
     float wall[] = {
             // positions         // colors
-            0.2f, 0.0f, 1.0f,    // bottom right red
-            0.2f,  1.0f, 1.0f,     // top right blue
+            0.1f, 0.0f, 1.0f,    // bottom right red
+            0.1f,  1.0f, 1.0f,     // top right blue
             0.0f, 0.0f, 1.0f,    // bottom left green
             0.0f,  1.0f, 1.0f,     // top left yellow
 
             0.0f, 0.0f, 0.0f,    // bottom left back violet
             0.0f,  1.0f, 0.0f,     // top left back pink
 
-            0.2f, 0.0f, 0.0f,    // bottom right back orange
-            0.2f,  1.0f, 0.0f,     // top right back cyan
+            0.1f, 0.0f, 0.0f,    // bottom right back orange
+            0.1f,  1.0f, 0.0f,     // top right back cyan
 
-            0.2f, 0.0f, 1.0f,    // bottom right red
-            0.2f,  1.0f, 1.0f,     // top right blue
+            0.1f, 0.0f, 1.0f,    // bottom right red
+            0.1f,  1.0f, 1.0f,     // top right blue
 
-            0.2f,  1.0f, 1.0f,     // top right blue
+            0.1f,  1.0f, 1.0f,     // top right blue
             0.0f,  1.0f, 1.0f,     // top left yellow
-            0.2f,  1.0f, 0.0f,    // top right back cyan
+            0.1f,  1.0f, 0.0f,    // top right back cyan
             0.0f,  1.0f, 0.0f,    // top left back pink
 
-            0.2f, 0.0f, 1.0f,    // bottom right red
+            0.1f, 0.0f, 1.0f,    // bottom right red
             0.0f, 0.0f, 1.0f,   // bottom left green
-            0.2f, 0.0f, 0.0f,     // bottom right back orange
+            0.1f, 0.0f, 0.0f,     // bottom right back orange
             0.0f, 0.0f, 0.0f,     // bottom left back violet
     };
 
@@ -243,6 +245,13 @@ int main()
     {
         glfwSetCursorPosCallback(window, mouse_callback);
 
+        if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS){
+            ghost1.isScared = !ghost1.isScared;
+            ghost2.isScared = !ghost2.isScared;
+            ghost3.isScared = !ghost3.isScared;
+            ghost4.isScared = !ghost4.isScared;
+        }
+
         //path = bfs.get_path(x+z*cols, glm::floor(cameraPos.x)+glm::floor(cameraPos.z)*cols);
 
         float currentFrame = glfwGetTime();
@@ -300,9 +309,29 @@ int main()
         loadWalls(model, modelLoc, vertexColorLocation);
 
         //load ghost
-
         loadGhost(vertexColorLocation, ghost1, ghost2, ghost3, ghost4, model, modelLoc);
 
+        //load coins
+
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<cols;j++){
+                if(grid[i][j].hasCoin){
+                    glUniform4f(vertexColorLocation, 1.0f,  1.0f, 0.0f, 1.0f);
+                    model = glm::mat4(1.0f);
+                    model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
+                    model = glm::scale(model, glm::vec3( 0.3f, 0.3f, 0.3f));
+                    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
+                    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
+                    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+                }
+            }
+        }
+        if(grid[glm::floor(cameraPos.z)][glm::floor(cameraPos.x)].hasCoin){
+            grid[glm::floor(cameraPos.z)][glm::floor(cameraPos.x)].hasCoin = false;
+            points += 10;
+            cout<<points<<endl;
+        }
         //glDrawArrays(GL_TRIANGLE_STRIP, num_angles*2+2,4);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -383,7 +412,7 @@ void loadWalls(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation)
             }
             if(grid[i][j].wallUp){
                 model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3((float)(j)+0.2f, 0, (float)i+0.2));
+                model = glm::translate(model, glm::vec3((float)(j)+0.1f, 0, (float)i+0.1));
                 model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
@@ -401,6 +430,8 @@ void loadWalls(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation)
         glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
         glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
     }
+
+
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly

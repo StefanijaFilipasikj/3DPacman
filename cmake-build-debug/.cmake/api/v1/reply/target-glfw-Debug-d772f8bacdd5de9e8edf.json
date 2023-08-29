@@ -105,15 +105,15 @@
 			[
 				{
 					"backtrace" : 6,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glfw/include"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/include"
 				},
 				{
 					"backtrace" : 7,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glfw/src"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/src"
 				},
 				{
 					"backtrace" : 7,
-					"path" : "C:/Users/drist/Desktop/Github/Unity/3D-Pacman/cmake-build-debug/vendor/glfw/src"
+					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug/vendor/glfw/src"
 				}
 			],
 			"language" : "C",

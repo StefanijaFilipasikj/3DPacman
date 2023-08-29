@@ -52,10 +52,10 @@ RM = "C:\Program Files\JetBrains\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe"
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\drist\Desktop\Github\Unity\3D-Pacman
+CMAKE_SOURCE_DIR = C:\Users\drist\Desktop\Github\Opengl\3D-Pacman
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug
+CMAKE_BINARY_DIR = C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/OpenGLPrj.dir/depend.make
@@ -70,33 +70,33 @@ include CMakeFiles/OpenGLPrj.dir/flags.make
 
 CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj: CMakeFiles/OpenGLPrj.dir/flags.make
 CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj: CMakeFiles/OpenGLPrj.dir/includes_CXX.rsp
-CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj: C:/Users/drist/Desktop/Github/Unity/3D-Pacman/src/main.cpp
+CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj: C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/src/main.cpp
 CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj: CMakeFiles/OpenGLPrj.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj -MF CMakeFiles\OpenGLPrj.dir\src\main.cpp.obj.d -o CMakeFiles\OpenGLPrj.dir\src\main.cpp.obj -c C:\Users\drist\Desktop\Github\Unity\3D-Pacman\src\main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj"
+	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj -MF CMakeFiles\OpenGLPrj.dir\src\main.cpp.obj.d -o CMakeFiles\OpenGLPrj.dir\src\main.cpp.obj -c C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\src\main.cpp
 
 CMakeFiles/OpenGLPrj.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/OpenGLPrj.dir/src/main.cpp.i"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\drist\Desktop\Github\Unity\3D-Pacman\src\main.cpp > CMakeFiles\OpenGLPrj.dir\src\main.cpp.i
+	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\src\main.cpp > CMakeFiles\OpenGLPrj.dir\src\main.cpp.i
 
 CMakeFiles/OpenGLPrj.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/OpenGLPrj.dir/src/main.cpp.s"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\drist\Desktop\Github\Unity\3D-Pacman\src\main.cpp -o CMakeFiles\OpenGLPrj.dir\src\main.cpp.s
+	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\src\main.cpp -o CMakeFiles\OpenGLPrj.dir\src\main.cpp.s
 
 CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj: CMakeFiles/OpenGLPrj.dir/flags.make
 CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj: CMakeFiles/OpenGLPrj.dir/includes_C.rsp
-CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj: C:/Users/drist/Desktop/Github/Unity/3D-Pacman/vendor/glad/src/glad.c
+CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj: C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/src/glad.c
 CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj: CMakeFiles/OpenGLPrj.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj -MF CMakeFiles\OpenGLPrj.dir\vendor\glad\src\glad.c.obj.d -o CMakeFiles\OpenGLPrj.dir\vendor\glad\src\glad.c.obj -c C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glad\src\glad.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj"
+	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj -MF CMakeFiles\OpenGLPrj.dir\vendor\glad\src\glad.c.obj.d -o CMakeFiles\OpenGLPrj.dir\vendor\glad\src\glad.c.obj -c C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glad\src\glad.c
 
 CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.i"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glad\src\glad.c > CMakeFiles\OpenGLPrj.dir\vendor\glad\src\glad.c.i
+	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glad\src\glad.c > CMakeFiles\OpenGLPrj.dir\vendor\glad\src\glad.c.i
 
 CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.s"
-	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\drist\Desktop\Github\Unity\3D-Pacman\vendor\glad\src\glad.c -o CMakeFiles\OpenGLPrj.dir\vendor\glad\src\glad.c.s
+	C:\PROGRA~1\JETBRA~1\CLION2~1.2\bin\mingw\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glad\src\glad.c -o CMakeFiles\OpenGLPrj.dir\vendor\glad\src\glad.c.s
 
 # Object files for target OpenGLPrj
 OpenGLPrj_OBJECTS = \
@@ -113,7 +113,7 @@ OpenGLPrj/OpenGLPrj.exe: vendor/glfw/src/libglfw3.a
 OpenGLPrj/OpenGLPrj.exe: CMakeFiles/OpenGLPrj.dir/linklibs.rsp
 OpenGLPrj/OpenGLPrj.exe: CMakeFiles/OpenGLPrj.dir/objects1.rsp
 OpenGLPrj/OpenGLPrj.exe: CMakeFiles/OpenGLPrj.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable OpenGLPrj\OpenGLPrj.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable OpenGLPrj\OpenGLPrj.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\OpenGLPrj.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -125,6 +125,6 @@ CMakeFiles/OpenGLPrj.dir/clean:
 .PHONY : CMakeFiles/OpenGLPrj.dir/clean
 
 CMakeFiles/OpenGLPrj.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\drist\Desktop\Github\Unity\3D-Pacman C:\Users\drist\Desktop\Github\Unity\3D-Pacman C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug C:\Users\drist\Desktop\Github\Unity\3D-Pacman\cmake-build-debug\CMakeFiles\OpenGLPrj.dir\DependInfo.cmake --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\drist\Desktop\Github\Opengl\3D-Pacman C:\Users\drist\Desktop\Github\Opengl\3D-Pacman C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug\CMakeFiles\OpenGLPrj.dir\DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/OpenGLPrj.dir/depend
 
