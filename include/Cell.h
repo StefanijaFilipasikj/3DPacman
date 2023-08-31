@@ -11,6 +11,7 @@ public:
     bool visited;
     bool wallUp, wallDown, wallLeft, wallRight;
     bool hasCoin;
+    bool hasPellet;
     int numWalls(){
         int num=0;
         if(wallUp) num++;

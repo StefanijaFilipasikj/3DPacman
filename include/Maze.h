@@ -37,8 +37,26 @@ public:
                 grid[i][j].wallLeft = true;
                 grid[i][j].wallRight = true;
                 grid[i][j].hasCoin = true;
+                grid[i][j].hasPellet = false;
             }
         }
+        grid[0][0].hasCoin = false;
+        grid[0][cols-1].hasCoin = false;
+        grid[rows-1][0].hasCoin = false;
+        grid[rows-1][cols-1].hasCoin = false;
+        grid[2][2].hasCoin = false;
+        grid[2][cols-3].hasCoin = false;
+        grid[rows-3][2].hasCoin = false;
+        grid[rows-3][cols-3].hasCoin = false;
+
+        grid[0][0].hasPellet = true;
+        grid[0][cols-1].hasPellet = true;
+        grid[rows-1][0].hasPellet = true;
+        grid[rows-1][cols-1].hasPellet = true;
+        grid[2][2].hasPellet = true;
+        grid[2][cols-3].hasPellet = true;
+        grid[rows-3][2].hasPellet = true;
+        grid[rows-3][cols-3].hasPellet = true;
     }
     vector<vector<Cell>> getGrid(){
         return grid;

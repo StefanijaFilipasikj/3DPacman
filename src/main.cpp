@@ -18,6 +18,14 @@ void processInput(GLFWwindow *window);
 void loadWalls(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation);
 void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4, glm::mat4 &model, unsigned int modelLoc) ;
 
+void loadCoins(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation);
+
+void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
+
+void pickupsCollision();
+
+void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
@@ -41,11 +49,12 @@ static const char *fragmentShaderSource = "#version 330 core\n"
                                           "}\n\0";
 
 glm::mat4 view = glm::mat4(1.0f);
-glm::vec3 cameraPos   = glm::vec3(5.0f, 20.0f,  5.0f);
+glm::vec3 cameraPos   = glm::vec3(5.0f, 1.0f,  5.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
 int points = 0;
+float timer = 0;
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -245,15 +254,6 @@ int main()
     {
         glfwSetCursorPosCallback(window, mouse_callback);
 
-        if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS){
-            ghost1.isScared = !ghost1.isScared;
-            ghost2.isScared = !ghost2.isScared;
-            ghost3.isScared = !ghost3.isScared;
-            ghost4.isScared = !ghost4.isScared;
-        }
-
-        //path = bfs.get_path(x+z*cols, glm::floor(cameraPos.x)+glm::floor(cameraPos.z)*cols);
-
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -289,11 +289,6 @@ int main()
         // be sure to activate the shader before any calls to glUniform
         glUseProgram(shaderProgram);
 
-        // update shader uniform
-        //double timeValue = glfwGetTime();
-        //float greenValue = static_cast<float> (sin(timeValue)) / 2.0f + 0.5f;
-
-
         //depth
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -312,27 +307,11 @@ int main()
         loadGhost(vertexColorLocation, ghost1, ghost2, ghost3, ghost4, model, modelLoc);
 
         //load coins
+        loadCoins(model, modelLoc, vertexColorLocation);
 
-        for(int i=0;i<rows;i++){
-            for(int j=0;j<cols;j++){
-                if(grid[i][j].hasCoin){
-                    glUniform4f(vertexColorLocation, 1.0f,  1.0f, 0.0f, 1.0f);
-                    model = glm::mat4(1.0f);
-                    model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
-                    model = glm::scale(model, glm::vec3( 0.3f, 0.3f, 0.3f));
-                    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-                    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
-                }
-            }
-        }
-        if(grid[glm::floor(cameraPos.z)][glm::floor(cameraPos.x)].hasCoin){
-            grid[glm::floor(cameraPos.z)][glm::floor(cameraPos.x)].hasCoin = false;
-            points += 10;
-            cout<<points<<endl;
-        }
-        //glDrawArrays(GL_TRIANGLE_STRIP, num_angles*2+2,4);
+        ghostScared(ghost1, ghost2, ghost3, ghost4);
+        pickupsCollision();
+        ghostCollision(ghost1, ghost2, ghost3, ghost4);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -349,6 +328,87 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
+}
+
+void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) {
+    if(timer > 0){
+        timer-=deltaTime;
+        ghost1.isScared = true;
+        ghost2.isScared = true;
+        ghost3.isScared = true;
+        ghost4.isScared = true;
+    }
+    if(timer < 0){
+        timer = 0;
+        ghost1.isScared = false;
+        ghost2.isScared = false;
+        ghost3.isScared = false;
+        ghost4.isScared = false;
+    }
+}
+
+void pickupsCollision() {
+    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin){
+        grid[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin = false;
+        points += 10;
+        cout<<points<<endl;
+    }
+    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet){
+        grid[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet = false;
+        points += 10;
+        cout<<points<<endl;
+        timer = 5;
+    }
+}
+
+void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) {
+    if(floor(cameraPos.x) == floor(ghost1.position.x) && floor(cameraPos.z) == floor(ghost1.position.z)){
+        if(ghost1.isScared){
+            ghost1 = Ghost(glm::vec3(0.0f,0.0f,0.0f), cols*rows);
+        }
+    }
+    if(floor(cameraPos.x) == floor(ghost2.position.x) && floor(cameraPos.z) == floor(ghost2.position.z)){
+        if(ghost2.isScared){
+            ghost2 = Ghost(glm::vec3(cols-1,0.0f,rows-1), cols*rows);
+        }
+    }
+    if(floor(cameraPos.x) == floor(ghost3.position.x) && floor(cameraPos.z) == floor(ghost3.position.z)){
+        if(ghost3.isScared){
+            ghost3 = Ghost(glm::vec3(cols-1,0.0f,0.0f), cols*rows);
+        }
+    }
+    if(floor(cameraPos.x) == floor(ghost4.position.x) && floor(cameraPos.z) == floor(ghost4.position.z)){
+        if(ghost4.isScared){
+            ghost4 = Ghost(glm::vec3(0.0f,0.0f,rows-1), cols*rows);
+        }
+    }
+}
+
+void loadCoins(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation) {
+    for(int i=0; i < rows; i++){
+        for(int j=0;j<cols;j++){
+            if(grid[i][j].hasCoin){
+                glUniform4f(vertexColorLocation, 1.0f,  1.0f, 0.0f, 1.0f);
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
+                model = glm::scale(model, glm::vec3( 0.3f, 0.3f, 0.3f));
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
+                glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
+                glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+            }
+            if(grid[i][j].hasPellet){
+                glUniform4f(vertexColorLocation, 1.0f,  0.5f, 0.0f, 1.0f);
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
+                model = glm::scale(model, glm::vec3( 0.3f, 0.3f, 0.3f));
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
+                glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
+                glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+            }
+        }
+    }
 }
 
 void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4, glm::mat4 &model, unsigned int modelLoc) {
@@ -459,6 +519,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
+
 bool firstMouse = true;
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2;
 float yaw = -90.0f;
