@@ -226,6 +226,18 @@
 		<Unit filename="C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/OpenGLPrj.hpp">
 			<Option target="OpenGLPrj"/>
 		</Unit>
+		<Unit filename="C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/shaders/main.frag">
+			<Option target="OpenGLPrj"/>
+		</Unit>
+		<Unit filename="C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/shaders/main.vert">
+			<Option target="OpenGLPrj"/>
+		</Unit>
+		<Unit filename="C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/shaders/text.frag">
+			<Option target="OpenGLPrj"/>
+		</Unit>
+		<Unit filename="C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/shaders/text.vert">
+			<Option target="OpenGLPrj"/>
+		</Unit>
 		<Unit filename="C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/src/main.cpp">
 			<Option target="OpenGLPrj"/>
 		</Unit>

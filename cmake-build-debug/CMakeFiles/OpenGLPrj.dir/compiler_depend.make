@@ -669,7 +669,23 @@ CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj: C:/Users/drist/Desktop/Github/Opengl/
   C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/unordered_set.h \
   C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Maze.h \
   C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Ghost.h \
-  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Bfs.h
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Bfs.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Shader.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/ft2build.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftheader.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/freetype.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftconfig.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftoption.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftstdlib.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/integer-types.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/public-macros.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/mac-support.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/fttypes.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/ftsystem.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/ftimage.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/fterrors.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/ftmoderr.h \
+  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/fterrdef.h
 
 CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj: C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/src/glad.c \
   C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/x86_64-w64-mingw32/include/stdio.h \
@@ -991,6 +1007,8 @@ C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_iterator_base_funcs.h:
 
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/mac-support.h:
+
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/x86_64-w64-mingw32/include/corecrt_wstdlib.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/tbmintrin.h:
@@ -1114,6 +1132,8 @@ C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/enqcmdintrin.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/bmi2intrin.h:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/ftsystem.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/clwbintrin.h:
 
@@ -1367,6 +1387,8 @@ C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/x86_64-w64-mingw32/include
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/x86_64-w64-mingw32/include/poppack.h:
 
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/freetype.h:
+
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/x86_64-w64-mingw32/include/pshpack2.h:
 
 C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/ext/quaternion_trigonometric.hpp:
@@ -1589,6 +1611,8 @@ C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/x86_64-w64-mingw32/include
 
 C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/vec2.hpp:
 
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftoption.h:
+
 C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/detail/compute_vector_relational.hpp:
 
 C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/ext/vector_float2.hpp:
@@ -1596,6 +1620,8 @@ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/ext/vector_float2.
 C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/simd/integer.h:
 
 C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/ext/vector_float2_precision.hpp:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Shader.h:
 
 C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/ext/vector_double2.hpp:
 
@@ -1869,6 +1895,8 @@ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/ext/matrix_clip_sp
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/x86_64-w64-mingw32/include/corecrt_stdio_config.h:
 
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/ftimage.h:
+
 C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm/glm/ext/matrix_transform.hpp:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/csignal:
@@ -1995,6 +2023,8 @@ C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/stl_function.h:
 
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/fterrors.h:
+
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/thread:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/alloc_traits.h:
@@ -2010,6 +2040,8 @@ C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/system_error:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/error_constants.h:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/fttypes.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/stdexcept:
 
@@ -2194,3 +2226,19 @@ C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/this_thread_sleep.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2022.3.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/typeindex:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/ft2build.h:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftheader.h:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftconfig.h:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftstdlib.h:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/integer-types.h:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/public-macros.h:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/ftmoderr.h:
+
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/fterrdef.h:

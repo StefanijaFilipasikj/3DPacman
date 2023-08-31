@@ -40,6 +40,12 @@
 				"parent" : 0
 			},
 			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 57,
+				"parent" : 0
+			},
+			{
 				"command" : 2,
 				"file" : 0,
 				"line" : 45,
@@ -65,34 +71,34 @@
 			"defines" : 
 			[
 				{
-					"backtrace" : 3,
+					"backtrace" : 4,
 					"define" : "GLFW_INCLUDE_NONE"
 				},
 				{
-					"backtrace" : 3,
+					"backtrace" : 4,
 					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Opengl/3D-Pacman\""
 				}
 			],
 			"includes" : 
 			[
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/include"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/include"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/stb"
 				}
 			],
@@ -112,41 +118,41 @@
 			"defines" : 
 			[
 				{
-					"backtrace" : 3,
+					"backtrace" : 4,
 					"define" : "GLFW_INCLUDE_NONE"
 				},
 				{
-					"backtrace" : 3,
+					"backtrace" : 4,
 					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Opengl/3D-Pacman\""
 				}
 			],
 			"includes" : 
 			[
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/include"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/include"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 5,
 					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/stb"
 				}
 			],
 			"language" : "C",
 			"sourceIndexes" : 
 			[
-				7
+				11
 			]
 		}
 	],
@@ -173,6 +179,11 @@
 			{
 				"backtrace" : 2,
 				"fragment" : "vendor\\glfw\\src\\libglfw3.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\Users\\drist\\Desktop\\Github\\Opengl\\3D-Pacman\\vendor\\freetype\\lib\\freetype.lib",
 				"role" : "libraries"
 			},
 			{
@@ -206,28 +217,38 @@
 			]
 		},
 		{
-			"name" : "",
+			"name" : "shaders",
 			"sourceIndexes" : 
 			[
 				2,
 				3,
 				4,
-				5,
-				6
+				5
+			]
+		},
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				6,
+				7,
+				8,
+				9,
+				10
 			]
 		},
 		{
 			"name" : "vendors",
 			"sourceIndexes" : 
 			[
-				7
+				11
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
-				8
+				12
 			]
 		}
 	],
@@ -246,39 +267,59 @@
 		},
 		{
 			"backtrace" : 1,
-			"path" : ".gitattributes",
+			"path" : "shaders/main.frag",
 			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "shaders/main.vert",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "shaders/text.frag",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "shaders/text.vert",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : ".gitattributes",
+			"sourceGroupIndex" : 3
 		},
 		{
 			"backtrace" : 1,
 			"path" : ".gitignore",
-			"sourceGroupIndex" : 2
+			"sourceGroupIndex" : 3
 		},
 		{
 			"backtrace" : 1,
 			"path" : ".gitmodules",
-			"sourceGroupIndex" : 2
+			"sourceGroupIndex" : 3
 		},
 		{
 			"backtrace" : 1,
 			"path" : "CMakeLists.txt",
-			"sourceGroupIndex" : 2
+			"sourceGroupIndex" : 3
 		},
 		{
 			"backtrace" : 1,
 			"path" : "README.md",
-			"sourceGroupIndex" : 2
+			"sourceGroupIndex" : 3
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 1,
 			"path" : "vendor/glad/src/glad.c",
-			"sourceGroupIndex" : 3
+			"sourceGroupIndex" : 4
 		},
 		{
 			"backtrace" : 1,
 			"path" : "include/Bfs.h",
-			"sourceGroupIndex" : 4
+			"sourceGroupIndex" : 5
 		}
 	],
 	"type" : "EXECUTABLE"

@@ -671,6 +671,22 @@ CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj
  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Maze.h
  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Ghost.h
  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Bfs.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Shader.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/ft2build.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftheader.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/freetype.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftconfig.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftoption.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/ftstdlib.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/integer-types.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/public-macros.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/config/mac-support.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/fttypes.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/ftsystem.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/ftimage.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/fterrors.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/ftmoderr.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/freetype/fterrdef.h
 
 CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj
  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/src/glad.c

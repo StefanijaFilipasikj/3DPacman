@@ -110,6 +110,7 @@ OpenGLPrj/OpenGLPrj.exe: CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj
 OpenGLPrj/OpenGLPrj.exe: CMakeFiles/OpenGLPrj.dir/vendor/glad/src/glad.c.obj
 OpenGLPrj/OpenGLPrj.exe: CMakeFiles/OpenGLPrj.dir/build.make
 OpenGLPrj/OpenGLPrj.exe: vendor/glfw/src/libglfw3.a
+OpenGLPrj/OpenGLPrj.exe: C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/freetype/lib/freetype.lib
 OpenGLPrj/OpenGLPrj.exe: CMakeFiles/OpenGLPrj.dir/linklibs.rsp
 OpenGLPrj/OpenGLPrj.exe: CMakeFiles/OpenGLPrj.dir/objects1.rsp
 OpenGLPrj/OpenGLPrj.exe: CMakeFiles/OpenGLPrj.dir/link.txt
