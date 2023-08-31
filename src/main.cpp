@@ -10,6 +10,7 @@
 #include <vector>
 #include <cmath>
 #include "glm/ext/scalar_constants.hpp"
+#include "Shader.h"
 
 const std::string program_name = ("GLSL shaders & uniforms");
 
@@ -30,26 +31,8 @@ void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 
-static const char *vertexShaderSource ="#version 330 core\n"
-                                       "layout (location = 0) in vec3 aPos;\n"
-                                       "uniform mat4 model;\n"
-                                       "uniform mat4 view;\n"
-                                       "uniform mat4 projection;"
-                                       "void main()\n"
-                                       "{\n"
-                                       "   gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
-                                       "}\0";
-
-static const char *fragmentShaderSource = "#version 330 core\n"
-                                          "out vec4 FragColor;\n"
-                                          "uniform vec4 ourColor;\n"
-                                          "void main()\n"
-                                          "{\n"
-                                          "   FragColor = ourColor;\n"
-                                          "}\n\0";
-
 glm::mat4 view = glm::mat4(1.0f);
-glm::vec3 cameraPos   = glm::vec3(5.0f, 1.0f,  5.0f);
+glm::vec3 cameraPos   = glm::vec3(5.0f, 20.0f,  5.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
@@ -93,10 +76,11 @@ int main()
         return -1;
     }
 
+    Shader mainShader = Shader("../../shaders/main.vert","../../shaders/main.frag");
     // build and compile our shader program
     // ------------------------------------
     // vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    /*GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
     glCompileShader(vertexShader);
 
@@ -132,7 +116,7 @@ int main()
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
     glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    glDeleteShader(fragmentShader);*/
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -269,9 +253,9 @@ int main()
         projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
 
         // retrieve the matrix uniform locations
-        unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
-        unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
-        unsigned int projLoc = glGetUniformLocation(shaderProgram, "projection");
+        unsigned int modelLoc = glGetUniformLocation(mainShader.ID, "model");
+        unsigned int viewLoc = glGetUniformLocation(mainShader.ID, "view");
+        unsigned int projLoc = glGetUniformLocation(mainShader.ID, "projection");
         // pass them to the shaders (3 different ways)
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
@@ -287,14 +271,14 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // be sure to activate the shader before any calls to glUniform
-        glUseProgram(shaderProgram);
+        mainShader.use();
 
         //depth
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //color uniform
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        int vertexColorLocation = glGetUniformLocation(mainShader.ID, "ourColor");
 
         // render the floor
         glUniform4f(vertexColorLocation, 0.0f,  0.0f, 0.0f, 1.0f);

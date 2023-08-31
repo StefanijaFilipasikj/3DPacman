@@ -667,4 +667,5 @@ CMakeFiles/OpenGLPrj.dir/src/main.cpp.obj: \
  C:/PROGRA~1/JETBRA~1/CLION2~1.2/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/unordered_set.h \
  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Maze.h \
  C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Ghost.h \
- C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Bfs.h
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Bfs.h \
+ C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include/Shader.h
