@@ -19,6 +19,7 @@ const std::string program_name = ("GLSL shaders & uniforms");
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void loadWalls(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation);
 void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4, glm::mat4 &model, unsigned int modelLoc);
 void loadCoins(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation);
@@ -26,19 +27,26 @@ void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
 void pickupsCollision();
 void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
 void RenderText(Shader shaderProgram,std::string text, float x, float y, float scale, glm::vec3 color);
+float distance(float x1, float x2);
 
+
+void
+loadMinimap(Shader &mainShader, glm::mat4 &projection, unsigned int VAO, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3,
+            Ghost &ghost4, unsigned int &modelLoc, unsigned int &viewLoc, unsigned int &projLoc,
+            int &vertexColorLocation);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 
 glm::mat4 view = glm::mat4(1.0f);
-glm::vec3 cameraPos   = glm::vec3(5.0f, 20.0f,  5.0f);
+glm::vec3 cameraPos   = glm::vec3(cols/2+0.5f, 0.5f,  rows/2+0.5f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
 int points = 0;
 float timer = 0;
+float wallSize = 0.1f;
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -77,6 +85,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // glad: load all OpenGL function pointers
@@ -92,6 +101,7 @@ int main()
 
     Shader mainShader = Shader("../../shaders/main.vert","../../shaders/main.frag");
     Shader textShader = Shader("../../shaders/text.vert","../../shaders/text.frag");
+    Shader minimapShader("../../shaders/minimap.vert", "../../shaders/minimap.frag");
 
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
     textShader.use();
@@ -176,28 +186,28 @@ int main()
     // ------------------------------------------------------------------
     float wall[] = {
             // positions         // colors
-            0.1f, 0.0f, 1.0f,    // bottom right red
-            0.1f,  1.0f, 1.0f,     // top right blue
+            wallSize, 0.0f, 1.0f,    // bottom right red
+            wallSize,  1.0f, 1.0f,     // top right blue
             0.0f, 0.0f, 1.0f,    // bottom left green
             0.0f,  1.0f, 1.0f,     // top left yellow
 
             0.0f, 0.0f, 0.0f,    // bottom left back violet
             0.0f,  1.0f, 0.0f,     // top left back pink
 
-            0.1f, 0.0f, 0.0f,    // bottom right back orange
-            0.1f,  1.0f, 0.0f,     // top right back cyan
+            wallSize, 0.0f, 0.0f,    // bottom right back orange
+            wallSize,  1.0f, 0.0f,     // top right back cyan
 
-            0.1f, 0.0f, 1.0f,    // bottom right red
-            0.1f,  1.0f, 1.0f,     // top right blue
+            wallSize, 0.0f, 1.0f,    // bottom right red
+            wallSize,  1.0f, 1.0f,     // top right blue
 
-            0.1f,  1.0f, 1.0f,     // top right blue
+            wallSize,  1.0f, 1.0f,     // top right blue
             0.0f,  1.0f, 1.0f,     // top left yellow
-            0.1f,  1.0f, 0.0f,    // top right back cyan
+            wallSize,  1.0f, 0.0f,    // top right back cyan
             0.0f,  1.0f, 0.0f,    // top left back pink
 
-            0.1f, 0.0f, 1.0f,    // bottom right red
+            wallSize, 0.0f, 1.0f,    // bottom right red
             0.0f, 0.0f, 1.0f,   // bottom left green
-            0.1f, 0.0f, 0.0f,     // bottom right back orange
+            wallSize, 0.0f, 0.0f,     // bottom right back orange
             0.0f, 0.0f, 0.0f,     // bottom left back violet
     };
 
@@ -235,6 +245,20 @@ int main()
             10.0f,0.0f,10.0f
     };
 
+    float minimap[] = {
+            /*-0.5,0.5f, 1.0f, 0.0f,   // bottom right
+            -0.5f,1.0f, 1.0f, 1.0f,   // top right
+            -1.0f,0.5f, 0.0f, 0.0f,   // bottom left
+            -1.0f, 1.0f, 0.0f, 1.0f    // top left*/
+            0.5f, 1.0f, 0.0f, 1.0f,
+            0.5f,0.5f, 0.0f, 0.0f,
+            1.0f,0.5f, 1.0f, 0.0f,
+
+            0.5f, 1.0f, 0.0f, 1.0f,
+            1.0f,0.5f, 1.0f, 0.0f,
+            1.0f,1.0f, 1.0f, 1.0f,
+    };
+
     std::vector<float> vertices;
     for(float f : floor)
         vertices.push_back(f);
@@ -264,10 +288,44 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    //for minimap
+    unsigned int quadVAO, quadVBO;
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(minimap), &minimap, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+    //create frame buffer for minimap
+    GLuint fbo;
+    glGenFramebuffersEXT(1, &fbo);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+    //create texture for minimap
+    GLuint img;
+    glGenTextures(1, &img);
+    glBindTexture(GL_TEXTURE_2D, img);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glGenerateMipmapEXT(GL_TEXTURE_2D);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, img, 0);
+    //create render buffer for minimap
+    GLuint depthbuffer;
+    glGenRenderbuffersEXT(1, &depthbuffer);
+    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthbuffer);
+    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, SCR_WIDTH, SCR_HEIGHT);
+    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthbuffer);
+
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
     //hide the cursor
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
     Maze maze = Maze();
     maze.generateMaze();
@@ -277,69 +335,62 @@ int main()
     Ghost ghost2 = Ghost(glm::vec3(cols-1,0.0f,rows-1), cols*rows);
     Ghost ghost3 = Ghost(glm::vec3(cols-1,0.0f,0.0f), cols*rows);
     Ghost ghost4 = Ghost(glm::vec3(0.0f,0.0f,rows-1), cols*rows);
-    /*BFS bfs = BFS(rows*cols);
-    vector<int> path = bfs.get_path(0, 17);*/
 
-    int x=0;
-    int z=0;
-    float time = 0;
-    float ghostMoveSpeed = 3.0f;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-        glfwSetCursorPosCallback(window, mouse_callback);
-
+        // deltatime
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        processInput(window);
+
+        //FIRST RENDER
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+        glm::mat4 model;
+        unsigned int modelLoc;
+        unsigned int viewLoc;
+        unsigned int projLoc;
+        int vertexColorLocation;
+        loadMinimap(mainShader, projection, VAO, ghost1, ghost2, ghost3, ghost4, modelLoc, viewLoc, projLoc,
+                    vertexColorLocation);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+
+        //SECOND RENDER
+        glEnable(GL_DEPTH_TEST);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        mainShader.use();
+
         //matrices
-        glm::mat4 model = glm::mat4(1.0f);
-        //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(60.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::mat4(1.0f);
 
         //cameraPos + cameraFront
         view = glm::lookAt(cameraPos, cameraFront + cameraPos, cameraUp);
 
-        glm::mat4 projection;
         projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
 
-        // be sure to activate the shader before any calls to glUniform
-        mainShader.use();
-        // retrieve the matrix uniform locations
-        unsigned int modelLoc = glGetUniformLocation(mainShader.ID, "model");
-        unsigned int viewLoc = glGetUniformLocation(mainShader.ID, "view");
-        unsigned int projLoc = glGetUniformLocation(mainShader.ID, "projection");
         // pass them to the shaders (3 different ways)
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
 
-        // input
-        // -----
-        processInput(window);
-
-        // render
-        // ------
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        //depth
-        glEnable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        //color uniform
-        int vertexColorLocation = glGetUniformLocation(mainShader.ID, "ourColor");
-
+        glBindVertexArray(VAO);
         // render the floor
         glUniform4f(vertexColorLocation, 0.0f,  0.0f, 0.0f, 1.0f);
-        glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         //load walls
         loadWalls(model, modelLoc, vertexColorLocation);
 
         //load ghost
+        ghost1.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+        ghost2.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+        ghost3.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+        ghost4.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         loadGhost(vertexColorLocation, ghost1, ghost2, ghost3, ghost4, model, modelLoc);
 
         //load coins
@@ -348,25 +399,86 @@ int main()
         ghostScared(ghost1, ghost2, ghost3, ghost4);
         pickupsCollision();
         ghostCollision(ghost1, ghost2, ghost3, ghost4);
-
         //ui text
-
         RenderText(textShader, "Points: "+ to_string(points), 0, SCR_HEIGHT-50, 1.0f, glm::vec3(0.0, 0.0f, 0.0f));
+
+        //MINIMAP
+        glDisable(GL_DEPTH_TEST);
+        glBindTexture(GL_TEXTURE_2D, img);
+        minimapShader.use();
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
+
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &quadVAO);
+    glDeleteBuffers(1, &quadVBO);
+    glDeleteVertexArrays(1, &VAO2);
+    glDeleteFramebuffersEXT(1, &fbo);
+    glDeleteTextures(1, &img);
+    glDeleteRenderbuffers(1, &depthbuffer);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
+}
+
+void
+loadMinimap(Shader &mainShader, glm::mat4 &projection, unsigned int VAO, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3,
+            Ghost &ghost4, unsigned int &modelLoc, unsigned int &viewLoc, unsigned int &projLoc,
+            int &vertexColorLocation) {
+    modelLoc= glGetUniformLocation(mainShader.ID, "model");
+    viewLoc= glGetUniformLocation(mainShader.ID, "view");
+    projLoc= glGetUniformLocation(mainShader.ID, "projection");
+    vertexColorLocation= glGetUniformLocation(mainShader.ID, "ourColor");
+    glEnable(GL_DEPTH_TEST);
+
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    mainShader.use();
+
+    //matrices
+    glm::mat4 model = glm::mat4(1.0f);
+
+    //cameraPos + cameraFront
+    glm::vec3 mCameraPos = glm::vec3(cameraPos.x, 10.0f,  cameraPos.z);
+    glm::vec3 mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);;
+    //mCameraFront.x = sin(glm::radians(-90.0f));
+    glm::mat4 view2 = glm::lookAt(mCameraPos, mCameraFront + mCameraPos, cameraUp);
+
+    //glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+    projection = glm::rotate(projection, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    // retrieve the matrix uniform locations
+// pass them to the shaders (3 different ways)
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view2[0][0]);
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
+
+    //color uniform
+    glBindVertexArray(VAO);
+
+    // render the floor
+    glUniform4f(vertexColorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    //load walls
+    loadWalls(model, modelLoc, vertexColorLocation);
+    //load ghost
+    loadGhost(vertexColorLocation, ghost1, ghost2, ghost3, ghost4, model, modelLoc);
+    //load coins
+    loadCoins(model, modelLoc, vertexColorLocation);
 }
 
 void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) {
@@ -454,7 +566,7 @@ void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &gho
     //red
     glUniform4f(vertexColorLocation, 1.0f,  0.0f, 0.0f, 1.0f);
     model = glm::mat4(1.0f);
-    ghost1.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
+    //ghost1.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
     model = glm::translate(model, glm::vec3( ghost1.position.x + 0.3f, 0.0f, ghost1.position.z + 0.3f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
@@ -463,7 +575,7 @@ void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &gho
     //blue
     glUniform4f(vertexColorLocation, 0.0f,  0.0f, 1.0f, 1.0f);
     model = glm::mat4(1.0f);
-    ghost2.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
+    //ghost2.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
     model = glm::translate(model, glm::vec3( ghost2.position.x + 0.3f, 0.0f, ghost2.position.z + 0.3f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
@@ -472,7 +584,7 @@ void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &gho
     //green
     glUniform4f(vertexColorLocation, 0.0f,  1.0f, 0.0f, 1.0f);
     model = glm::mat4(1.0f);
-    ghost3.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
+    //ghost3.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
     model = glm::translate(model, glm::vec3( ghost3.position.x + 0.3f, 0.0f, ghost3.position.z + 0.3f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
@@ -481,7 +593,7 @@ void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &gho
     //yellow
     glUniform4f(vertexColorLocation, 0.0f,  1.0f, 1.0f, 1.0f);
     model = glm::mat4(1.0f);
-    ghost4.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
+    //ghost4.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
     model = glm::translate(model, glm::vec3( ghost4.position.x + 0.3f, 0.0f, ghost4.position.z + 0.3f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
@@ -583,16 +695,28 @@ void RenderText(Shader shaderProgram,std::string text, float x, float y, float s
 void processInput(GLFWwindow *window)
 {
     float cameraSpeed = 4.0f * deltaTime;
+    glm::vec3 camera = glm::vec3(1.0f, 0.0f,  1.0f);
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
+        cameraPos += cameraSpeed * cameraFront * camera;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
+        cameraPos -= cameraSpeed * cameraFront * camera;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        cameraPos -= glm::normalize(glm::cross(cameraFront * camera, cameraUp)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        cameraPos += glm::normalize(glm::cross(cameraFront * camera, cameraUp)) * cameraSpeed;
+
+    //wall collisions
+    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallUp && distance(cameraPos.z,glm::floor(cameraPos.z)) <= wallSize)
+        cameraPos.z = glm::floor(cameraPos.z)+wallSize;
+    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallDown && distance(cameraPos.z,glm::floor(cameraPos.z)+1.0f) <= wallSize)
+        cameraPos.z = glm::floor(cameraPos.z)+1.0f-wallSize;
+    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallLeft && distance(cameraPos.x,glm::floor(cameraPos.x)) <= wallSize)
+        cameraPos.x = glm::floor(cameraPos.x)+wallSize;
+    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallRight && distance(cameraPos.x,glm::floor(cameraPos.x)+1.0f) <= wallSize)
+        cameraPos.x = glm::floor(cameraPos.x)+1.0f-wallSize;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -640,4 +764,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     cameraFront = glm::normalize(direction);
+}
+
+float distance(float x1, float x2)
+{
+    return glm::abs(x1-x2);
 }
