@@ -54,4 +54,4 @@ target_link_libraries(${PROJECT_NAME}
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
-target_link_libraries(${PROJECT_NAME} C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/freetype/lib/freetype.lib)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/vendor/freetype/lib/freetype.lib)

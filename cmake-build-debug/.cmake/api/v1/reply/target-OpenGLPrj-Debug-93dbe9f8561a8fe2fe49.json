@@ -76,30 +76,30 @@
 				},
 				{
 					"backtrace" : 4,
-					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Opengl/3D-Pacman\""
+					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/sfili/Documents/GitHub/3D-Pacman\""
 				}
 			],
 			"includes" : 
 			[
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/include"
 				},
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/include"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/glad/include"
 				},
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/include"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/glfw/include"
 				},
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/glm"
 				},
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/stb"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/stb"
 				}
 			],
 			"language" : "CXX",
@@ -123,36 +123,36 @@
 				},
 				{
 					"backtrace" : 4,
-					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/drist/Desktop/Github/Opengl/3D-Pacman\""
+					"define" : "PROJECT_SOURCE_DIR=\"C:/Users/sfili/Documents/GitHub/3D-Pacman\""
 				}
 			],
 			"includes" : 
 			[
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/include"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/include"
 				},
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glad/include"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/glad/include"
 				},
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/include"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/glfw/include"
 				},
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glm"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/glm"
 				},
 				{
 					"backtrace" : 5,
-					"path" : "C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/stb"
+					"path" : "C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/stb"
 				}
 			],
 			"language" : "C",
 			"sourceIndexes" : 
 			[
-				11
+				13
 			]
 		}
 	],
@@ -183,7 +183,7 @@
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "C:\\Users\\drist\\Desktop\\Github\\Opengl\\3D-Pacman\\vendor\\freetype\\lib\\freetype.lib",
+				"fragment" : "C:\\Users\\sfili\\Documents\\GitHub\\3D-Pacman\\vendor\\freetype\\lib\\freetype.lib",
 				"role" : "libraries"
 			},
 			{
@@ -223,32 +223,34 @@
 				2,
 				3,
 				4,
-				5
+				5,
+				6,
+				7
 			]
 		},
 		{
 			"name" : "",
 			"sourceIndexes" : 
 			[
-				6,
-				7,
 				8,
 				9,
-				10
+				10,
+				11,
+				12
 			]
 		},
 		{
 			"name" : "vendors",
 			"sourceIndexes" : 
 			[
-				11
+				13
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
-				12
+				14
 			]
 		}
 	],
@@ -273,6 +275,16 @@
 		{
 			"backtrace" : 1,
 			"path" : "shaders/main.vert",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "shaders/minimap.frag",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 1,
+			"path" : "shaders/minimap.vert",
 			"sourceGroupIndex" : 2
 		},
 		{

@@ -118,7 +118,7 @@ int main()
     }
 
     // find path to font
-    std::string font_name = "C:\\Users\\drist\\Desktop\\Github\\Opengl\\3D-Pacman\\fonts\\arial.ttf";
+    std::string font_name = "../../fonts/arial.ttf";
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;

@@ -1,6 +1,6 @@
-"C:\Program Files\JetBrains\CLion 2022.3.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" -S C:\Users\drist\Desktop\Github\Opengl\3D-Pacman -B C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\cmake-build-debug
+"C:\Program Files\JetBrains\CLion 2023.2.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" -S C:\Users\sfili\Documents\GitHub\3D-Pacman -B C:\Users\sfili\Documents\GitHub\3D-Pacman\cmake-build-debug
 -- Could NOT find Vulkan (missing: VULKAN_LIBRARY VULKAN_INCLUDE_DIR) 
 -- Using Win32 for window creation
--- Configuring done
--- Generating done
--- Build files have been written to: C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/cmake-build-debug
+-- Configuring done (0.2s)
+-- Generating done (0.3s)
+-- Build files have been written to: C:/Users/sfili/Documents/GitHub/3D-Pacman/cmake-build-debug
