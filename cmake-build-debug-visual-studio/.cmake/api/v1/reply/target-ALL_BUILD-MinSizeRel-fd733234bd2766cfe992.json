@@ -1,0 +1,46 @@
+{
+	"backtrace" : 0,
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : 
+		[
+			"vendor/assimp/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "zlibstatic::@a88bd8d5fa47d82f67fc"
+		},
+		{
+			"id" : "unit::@e249f26fae82ad9754c3"
+		},
+		{
+			"id" : "assimp::@73aa4729bf46b0baaf8e"
+		},
+		{
+			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
+		}
+	],
+	"folder" : 
+	{
+		"name" : "CMakePredefinedTargets"
+	},
+	"id" : "ALL_BUILD::@c4807781decb42661c27",
+	"isGeneratorProvided" : true,
+	"name" : "ALL_BUILD",
+	"paths" : 
+	{
+		"build" : "vendor/assimp",
+		"source" : "vendor/assimp"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

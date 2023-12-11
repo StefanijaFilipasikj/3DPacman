@@ -1,0 +1,9 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/CheckCSourceCompiles.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/CheckFunctionExists.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/CheckIncludeFile.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/CheckIncludeFileCXX.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/CheckTypeSize.cmake
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/assimp/contrib/zlib/CMakeLists.txt
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/assimp/contrib/zlib/zconf.h.cmakein
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/assimp/contrib/zlib/zlib.pc.cmakein

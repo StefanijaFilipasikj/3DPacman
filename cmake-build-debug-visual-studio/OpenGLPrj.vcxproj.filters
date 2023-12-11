@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\vendor\glad\src\glad.c">
+      <Filter>vendors</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\include\OpenGLPrj.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\include\Bfs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\shaders\main.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\shaders\main.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\shaders\minimap.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\shaders\minimap.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\shaders\text.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\shaders\text.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\.gitattributes" />
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\.gitignore" />
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\.gitmodules" />
+    <None Include="C:\Users\drist\Desktop\Github\Opengl\3D-Pacman\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{1C1C242E-36EF-3938-A4E9-1FB0809D3CCF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{EA1955B7-537F-33D5-ADE4-0E6C76F6CF07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{358CDCD3-BB44-3B2B-94C4-4BDDC425B803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{A2FA8061-150D-3596-B8CC-206BE9369239}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendors">
+      <UniqueIdentifier>{94C00E88-8DA9-364C-B6A0-D58D68C40958}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

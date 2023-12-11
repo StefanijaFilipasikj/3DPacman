@@ -8,7 +8,7 @@
 // C++ code to print BFS traversal from a given
 // source vertex
 
-#include <bits/stdc++.h>
+#include <stack>
 #include "Maze.h"
 using namespace std;
 
@@ -33,6 +33,9 @@ class BFS {
     }
 
 public:
+
+
+
     BFS(){
         this->V = 0;
         adj.resize(V);
@@ -62,7 +65,7 @@ public:
                     addEdge(j+i*cols,(j+1)+(i)*cols);
                 }
             }
-           // cout<<endl;
+            // cout<<endl;
         }
     }
 
@@ -108,7 +111,7 @@ public:
     vector<int> get_path(int source, int dest) {
 
         // it stores parent for each vertex to trace the path.
-        int parent[V];
+        int* parent = new int[V];
 
         // stack to store the shortest path.
         stack<int> st;
@@ -143,7 +146,7 @@ public:
     bool Run_BFS(int source, int dest, int parent[]) {
 
         queue<int> q;
-        bool visited[V];
+        bool* visited = new bool[V];
 
         // setting all the vertices as non-visited
         // and parents of all vertices as -1.

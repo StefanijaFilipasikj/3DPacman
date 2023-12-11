@@ -1,0 +1,17 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/BasicConfigVersion-SameMajorVersion.cmake.in
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/CMakePackageConfigHelpers.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/CheckCSourceCompiles.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/CheckIncludeFile.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/CheckLibraryExists.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/FindPackageMessage.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/FindThreads.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/Internal/CheckSourceCompiles.cmake
+C:/Program Files/JetBrains/CLion 2022.3.2/bin/cmake/win/x64/share/cmake-3.24/Modules/WriteBasicConfigVersionFile.cmake
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/CMake/modules/FindVulkan.cmake
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/CMakeLists.txt
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/cmake_uninstall.cmake.in
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/src/glfw3.pc.in
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/src/glfw3Config.cmake.in
+C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/glfw/src/glfw_config.h.in

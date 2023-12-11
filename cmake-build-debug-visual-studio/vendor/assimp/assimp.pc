@@ -1,0 +1,9 @@
+libdir=C:/Program Files (x86)/OpenGLPrj/lib
+includedir=C:/Program Files (x86)/OpenGLPrj/include
+
+Name: OpenGLPrj
+Description: Import various well-known 3D model formats in an uniform manner.
+Version: 5.3.0
+Libs: -L${libdir} -lassimp
+Libs.private:  
+Cflags: -I${includedir}

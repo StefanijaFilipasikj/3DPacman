@@ -12,6 +12,8 @@
 #include "glm/ext/scalar_constants.hpp"
 #include "Shader.h"
 #include <ft2build.h>
+#include <map>
+#include <assimp/Importer.hpp>
 #include FT_FREETYPE_H
 
 
@@ -99,9 +101,9 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    Shader mainShader = Shader("../../shaders/main.vert","../../shaders/main.frag");
-    Shader textShader = Shader("../../shaders/text.vert","../../shaders/text.frag");
-    Shader minimapShader("../../shaders/minimap.vert", "../../shaders/minimap.frag");
+    Shader mainShader = Shader("../../../shaders/main.vert","../../../shaders/main.frag");
+    Shader textShader = Shader("../../../shaders/text.vert","../../../shaders/text.frag");
+    Shader minimapShader("../../../shaders/minimap.vert", "../../../shaders/minimap.frag");
 
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
     textShader.use();
@@ -118,7 +120,7 @@ int main()
     }
 
     // find path to font
-    std::string font_name = "../../fonts/arial.ttf";
+    std::string font_name = "../../../fonts/arial.ttf";
     if (font_name.empty())
     {
         std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
