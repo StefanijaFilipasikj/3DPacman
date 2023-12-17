@@ -559,8 +559,10 @@ void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
     //red
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3( ghost1.position.x  + 0.5f, 0.3f, ghost1.position.z + 0.5f));
+    model = glm::rotate(model, glm::radians(ghost1.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    cout<<ghost1.rotation<<endl;
     if(ghost1.isScared)
         scared.Draw(shader);
     else
@@ -569,6 +571,7 @@ void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
     //blue
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3( ghost2.position.x + 0.5f, 0.3f, ghost2.position.z + 0.5f));
+    model = glm::rotate(model, glm::radians(ghost2.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     if(ghost2.isScared)
@@ -579,6 +582,7 @@ void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
     //green
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3( ghost3.position.x + 0.5f, 0.3f, ghost3.position.z + 0.5f));
+    model = glm::rotate(model, glm::radians(ghost3.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     if(ghost3.isScared)
@@ -589,6 +593,7 @@ void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
     //yellow
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3( ghost4.position.x + 0.5f, 0.3f, ghost4.position.z + 0.5f));
+    model = glm::rotate(model, glm::radians(ghost4.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     if(ghost4.isScared)
