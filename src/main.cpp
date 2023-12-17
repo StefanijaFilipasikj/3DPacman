@@ -12,6 +12,7 @@
 #include "glm/ext/scalar_constants.hpp"
 #include "Shader.h"
 #include <ft2build.h>
+#include <Model.h>
 #include <map>
 #include <assimp/Importer.hpp>
 #include FT_FREETYPE_H
@@ -22,20 +23,16 @@ const std::string program_name = ("GLSL shaders & uniforms");
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void loadWalls(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation);
-void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4, glm::mat4 &model, unsigned int modelLoc);
-void loadCoins(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation);
+void loadWalls(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &wall);
+void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
+               Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model, unsigned int modelLoc) ;
+
+void loadCoins(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &coin, Model &pellet);
 void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
 void pickupsCollision();
 void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
 void RenderText(Shader shaderProgram,std::string text, float x, float y, float scale, glm::vec3 color);
 float distance(float x1, float x2);
-
-
-void
-loadMinimap(Shader &mainShader, glm::mat4 &projection, unsigned int VAO, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3,
-            Ghost &ghost4, unsigned int &modelLoc, unsigned int &viewLoc, unsigned int &projLoc,
-            int &vertexColorLocation);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -104,6 +101,9 @@ int main()
     Shader mainShader = Shader("../../../shaders/main.vert","../../../shaders/main.frag");
     Shader textShader = Shader("../../../shaders/text.vert","../../../shaders/text.frag");
     Shader minimapShader("../../../shaders/minimap.vert", "../../../shaders/minimap.frag");
+    Shader modelLoadingShader("../../../shaders/model_loading.vert", "../../../shaders/model_loading.frag");
+
+
 
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
     textShader.use();
@@ -186,7 +186,7 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float wall[] = {
+    float wallX[] = {
             // positions         // colors
             wallSize, 0.0f, 1.0f,    // bottom right red
             wallSize,  1.0f, 1.0f,     // top right blue
@@ -240,7 +240,7 @@ int main()
             0.0f, 0.0f, 0.0f,     // bottom left back violet
     };
 
-    float floor[] = {
+    float floorX[] = {
             0.0f,0.0f,0.0f,
             10.0f,0.0f,0.0f,
             0.0f,0.0f,10.0f,
@@ -262,9 +262,9 @@ int main()
     };
 
     std::vector<float> vertices;
-    for(float f : floor)
+    for(float f : floorX)
         vertices.push_back(f);
-    for(float f : wall)
+    for(float f : wallX)
         vertices.push_back(f);
     for(float f : square)
         vertices.push_back(f);
@@ -338,11 +338,21 @@ int main()
     Ghost ghost3 = Ghost(glm::vec3(cols-1,0.0f,0.0f), cols*rows);
     Ghost ghost4 = Ghost(glm::vec3(0.0f,0.0f,rows-1), cols*rows);
 
+    Model floor("../../../blender objects/colliders/pacman_floor.obj");
+    Model wall("../../../blender objects/colliders/pacman_wall.obj");
+    Model coin("../../../blender objects/pickups/pacman_ball.obj");
+    Model pellet("../../../blender objects/pickups/pacman_powerup.obj");
+
+    Model blinky("../../../blender objects/ghosts/pacman_ghost_red.obj");
+    Model pinky("../../../blender objects/ghosts/pacman_ghost_pink.obj");
+    Model inky("../../../blender objects/ghosts/pacman_ghost_blue.obj");
+    Model clyde("../../../blender objects/ghosts/pacman_ghost_orange.obj");
+    Model scaredGhost("../../../blender objects/ghosts/pacman_ghost_scared.obj");
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-        // deltatime
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -351,52 +361,82 @@ int main()
 
         //FIRST RENDER
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-        glm::mat4 model;
-        unsigned int modelLoc;
-        unsigned int viewLoc;
-        unsigned int projLoc;
-        int vertexColorLocation;
-        loadMinimap(mainShader, projection, VAO, ghost1, ghost2, ghost3, ghost4, modelLoc, viewLoc, projLoc,
-                    vertexColorLocation);
+        unsigned modelLoc= glGetUniformLocation(modelLoadingShader.ID, "model");
+        unsigned viewLoc= glGetUniformLocation(modelLoadingShader.ID, "view");
+        unsigned projLoc= glGetUniformLocation(modelLoadingShader.ID, "projection");
+        glEnable(GL_DEPTH_TEST);
+
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        modelLoadingShader.use();
+
+        glm::mat4 model = glm::mat4(1.0f);
+
+        //cameraPos + cameraFront
+        glm::vec3 mCameraPos = glm::vec3(cameraPos.x, 10.0f,  cameraPos.z);
+        glm::vec3 mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);;
+        //mCameraFront.x = sin(glm::radians(-90.0f));
+        glm::mat4 view2 = glm::lookAt(mCameraPos, mCameraFront + mCameraPos, cameraUp);
+
+        glm::mat4 projection2;
+        projection2 = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+        projection2 = glm::rotate(projection2, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+        // retrieve the matrix uniform locations
+        // pass them to the shaders (3 different ways)
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view2[0][0]);
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection2[0][0]);
+
+        floor.Draw(modelLoadingShader);
+
+        //load walls
+        loadWalls(model, modelLoc, modelLoadingShader, wall);
+
+        //load ghost
+        loadGhost(ghost1, ghost2, ghost3, ghost4,
+                  blinky, pinky, inky, clyde, scaredGhost, modelLoadingShader, model, modelLoc);
+
+        //load coins
+        loadCoins(model, modelLoc, modelLoadingShader, coin, pellet);
+
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        //FIRST RENDER END
 
 
         //SECOND RENDER
         glEnable(GL_DEPTH_TEST);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        mainShader.use();
+        modelLoadingShader.use();
 
-        //matrices
         model = glm::mat4(1.0f);
 
-        //cameraPos + cameraFront
         view = glm::lookAt(cameraPos, cameraFront + cameraPos, cameraUp);
-
         projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+
+        modelLoadingShader.use();
 
         // pass them to the shaders (3 different ways)
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
 
-        glBindVertexArray(VAO);
-        // render the floor
-        glUniform4f(vertexColorLocation, 0.0f,  0.0f, 0.0f, 1.0f);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        floor.Draw(modelLoadingShader);
 
         //load walls
-        loadWalls(model, modelLoc, vertexColorLocation);
+        loadWalls(model, modelLoc, modelLoadingShader, wall);
 
         //load ghost
         ghost1.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         ghost2.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         ghost3.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         ghost4.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
-        loadGhost(vertexColorLocation, ghost1, ghost2, ghost3, ghost4, model, modelLoc);
+        loadGhost(ghost1, ghost2, ghost3, ghost4,
+                  blinky, pinky, inky, clyde, scaredGhost, modelLoadingShader, model, modelLoc);
 
         //load coins
-        loadCoins(model, modelLoc, vertexColorLocation);
+        loadCoins(model, modelLoc, modelLoadingShader, coin, pellet);
 
         ghostScared(ghost1, ghost2, ghost3, ghost4);
         pickupsCollision();
@@ -411,11 +451,12 @@ int main()
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
+        //SECOND RENDER END
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
-
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
@@ -433,54 +474,6 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
-}
-
-void
-loadMinimap(Shader &mainShader, glm::mat4 &projection, unsigned int VAO, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3,
-            Ghost &ghost4, unsigned int &modelLoc, unsigned int &viewLoc, unsigned int &projLoc,
-            int &vertexColorLocation) {
-    modelLoc= glGetUniformLocation(mainShader.ID, "model");
-    viewLoc= glGetUniformLocation(mainShader.ID, "view");
-    projLoc= glGetUniformLocation(mainShader.ID, "projection");
-    vertexColorLocation= glGetUniformLocation(mainShader.ID, "ourColor");
-    glEnable(GL_DEPTH_TEST);
-
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    mainShader.use();
-
-    //matrices
-    glm::mat4 model = glm::mat4(1.0f);
-
-    //cameraPos + cameraFront
-    glm::vec3 mCameraPos = glm::vec3(cameraPos.x, 10.0f,  cameraPos.z);
-    glm::vec3 mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);;
-    //mCameraFront.x = sin(glm::radians(-90.0f));
-    glm::mat4 view2 = glm::lookAt(mCameraPos, mCameraFront + mCameraPos, cameraUp);
-
-    //glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
-    projection = glm::rotate(projection, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    // retrieve the matrix uniform locations
-// pass them to the shaders (3 different ways)
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view2[0][0]);
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
-
-    //color uniform
-    glBindVertexArray(VAO);
-
-    // render the floor
-    glUniform4f(vertexColorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    //load walls
-    loadWalls(model, modelLoc, vertexColorLocation);
-    //load ghost
-    loadGhost(vertexColorLocation, ghost1, ghost2, ghost3, ghost4, model, modelLoc);
-    //load coins
-    loadCoins(model, modelLoc, vertexColorLocation);
 }
 
 void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) {
@@ -537,111 +530,108 @@ void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) 
     }
 }
 
-void loadCoins(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation) {
+void loadCoins(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &coin, Model &pellet) {
     for(int i=0; i < rows; i++){
         for(int j=0;j<cols;j++){
             if(grid[i][j].hasCoin){
-                glUniform4f(vertexColorLocation, 1.0f,  1.0f, 0.0f, 1.0f);
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
-                model = glm::scale(model, glm::vec3( 0.3f, 0.3f, 0.3f));
+                model = glm::scale(model, glm::vec3( 0.08f, 0.08f, 0.08f));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-                glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
-                glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
-                glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+                coin.Draw(shader);
             }
+
             if(grid[i][j].hasPellet){
-                glUniform4f(vertexColorLocation, 1.0f,  0.5f, 0.0f, 1.0f);
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
-                model = glm::scale(model, glm::vec3( 0.3f, 0.3f, 0.3f));
+                model = glm::scale(model, glm::vec3( 0.08f, 0.08f, 0.08f));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-                glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
-                glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
-                glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+                pellet.Draw(shader);
             }
         }
     }
 }
 
-void loadGhost(int vertexColorLocation, Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4, glm::mat4 &model, unsigned int modelLoc) {
+void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
+               Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model, unsigned int modelLoc) {
+    float scale = 0.2f;
+
     //red
-    glUniform4f(vertexColorLocation, 1.0f,  0.0f, 0.0f, 1.0f);
     model = glm::mat4(1.0f);
-    //ghost1.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
-    model = glm::translate(model, glm::vec3( ghost1.position.x + 0.3f, 0.0f, ghost1.position.z + 0.3f));
+    model = glm::translate(model, glm::vec3( ghost1.position.x  + 0.5f, 0.3f, ghost1.position.z + 0.5f));
+    model = glm::scale(model, glm::vec3( scale, scale, scale));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
-    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+    if(ghost1.isScared)
+        scared.Draw(shader);
+    else
+        blinky.Draw(shader);
+
     //blue
-    glUniform4f(vertexColorLocation, 0.0f,  0.0f, 1.0f, 1.0f);
     model = glm::mat4(1.0f);
-    //ghost2.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
-    model = glm::translate(model, glm::vec3( ghost2.position.x + 0.3f, 0.0f, ghost2.position.z + 0.3f));
+    model = glm::translate(model, glm::vec3( ghost2.position.x + 0.5f, 0.3f, ghost2.position.z + 0.5f));
+    model = glm::scale(model, glm::vec3( scale, scale, scale));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
-    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+    if(ghost2.isScared)
+        scared.Draw(shader);
+    else
+        pinky.Draw(shader);
+
     //green
-    glUniform4f(vertexColorLocation, 0.0f,  1.0f, 0.0f, 1.0f);
     model = glm::mat4(1.0f);
-    //ghost3.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
-    model = glm::translate(model, glm::vec3( ghost3.position.x + 0.3f, 0.0f, ghost3.position.z + 0.3f));
+    model = glm::translate(model, glm::vec3( ghost3.position.x + 0.5f, 0.3f, ghost3.position.z + 0.5f));
+    model = glm::scale(model, glm::vec3( scale, scale, scale));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
-    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+    if(ghost3.isScared)
+        scared.Draw(shader);
+    else
+        inky.Draw(shader);
+
     //yellow
-    glUniform4f(vertexColorLocation, 0.0f,  1.0f, 1.0f, 1.0f);
     model = glm::mat4(1.0f);
-    //ghost4.move(deltaTime, floor(cameraPos.x) + floor(cameraPos.z) * cols);
-    model = glm::translate(model, glm::vec3( ghost4.position.x + 0.3f, 0.0f, ghost4.position.z + 0.3f));
+    model = glm::translate(model, glm::vec3( ghost4.position.x + 0.5f, 0.3f, ghost4.position.z + 0.5f));
+    model = glm::scale(model, glm::vec3( scale, scale, scale));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glDrawArrays(GL_TRIANGLE_STRIP, 22, 10);
-    glDrawArrays(GL_TRIANGLE_STRIP, 32, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 36, 4);
+    if(ghost4.isScared)
+        scared.Draw(shader);
+    else
+        clyde.Draw(shader);
 }
 
-void loadWalls(glm::mat4 &model, unsigned int modelLoc, int vertexColorLocation) {
-    glUniform4f(vertexColorLocation, 0.0f, 0.75f, 1.0f, 1.0f);
+void loadWalls(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &wall) {
+    float scale = 0.132f;
     for(int i=0;i<rows;i++){
         for(int j=0;j<cols;j++){
             if(grid[i][j].wallRight){
                 model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3((float)(j+1), 0, (float)i));
+                model = glm::translate(model, glm::vec3((float)(j+1), 0.05f, (float)i+0.6f));
+                model = glm::scale(model, glm::vec3( scale, scale, scale));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-                glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
-                glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
-                glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
+                wall.Draw(shader);
             }
             if(grid[i][j].wallLeft){
                 model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3((float)(j), 0, (float)i));
+                model = glm::translate(model, glm::vec3((float)(j), 0.05f, (float)i+0.6f));
+                model = glm::scale(model, glm::vec3( scale, scale, scale));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-                glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
-                glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
-                glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
+                wall.Draw(shader);
             }
             if(grid[i][j].wallUp){
                 model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3((float)(j)+0.1f, 0, (float)i+0.1));
+                model = glm::translate(model, glm::vec3((float)(j)+0.5f, 0.05f, (float)i+0.1));
                 model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
+                model = glm::scale(model, glm::vec3( scale, scale, scale));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-                glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
-                glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
-                glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
+                wall.Draw(shader);
             }
         }
     }
     for(int j=0;j<cols;j++){
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3((float)(j)+0.2f, 0, rows));
+        model = glm::translate(model, glm::vec3((float)(j)+0.5f, 0.05f, rows));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
+        model = glm::scale(model, glm::vec3( scale, scale, scale));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glDrawArrays(GL_TRIANGLE_STRIP, 4, 10);
-        glDrawArrays(GL_TRIANGLE_STRIP, 14, 4);
-        glDrawArrays(GL_TRIANGLE_STRIP, 18, 4);
+        wall.Draw(shader);
     }
 
 
