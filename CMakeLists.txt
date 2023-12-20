@@ -7,6 +7,7 @@ option(GLFW_BUILD_TESTS OFF)
 add_subdirectory(vendor/glfw)
 
 add_subdirectory(vendor/assimp)
+add_subdirectory(vendor/freetype)
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
@@ -50,11 +51,11 @@ add_definitions(-DGLFW_INCLUDE_NONE
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${VENDORS_SOURCES} include/Bfs.h)
-target_link_libraries(${PROJECT_NAME} assimp
+target_link_libraries(${PROJECT_NAME} assimp freetype
 		      glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
 		      )
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
-target_link_libraries(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/vendor/freetype/lib/freetype.lib)
+#target_link_libraries(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/vendor/freetype/lib/freetype.lib)

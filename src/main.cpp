@@ -447,6 +447,18 @@ int main()
             }
         }
 
+        // spotLight
+        modelLoadingShader.setVec3("spotLight.position", cameraPos);
+        modelLoadingShader.setVec3("spotLight.direction", cameraFront);
+        modelLoadingShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+        modelLoadingShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+        modelLoadingShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+        modelLoadingShader.setFloat("spotLight.constant", 1.0f);
+        modelLoadingShader.setFloat("spotLight.linear", 0.09f);
+        modelLoadingShader.setFloat("spotLight.quadratic", 0.032f);
+        modelLoadingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+        modelLoadingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(25.0f)));
+
         floor.Draw(modelLoadingShader);
 
         //load walls
