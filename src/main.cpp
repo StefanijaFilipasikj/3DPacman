@@ -2,14 +2,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Maze.h"
-#include "Bfs.h"
 #include "Ghost.h"
 
 #include <iostream>
 #include <cmath>
 #include <vector>
-#include <cmath>
-#include "glm/ext/scalar_constants.hpp"
 #include "Shader.h"
 #include <ft2build.h>
 #include <Model.h>
@@ -23,11 +20,11 @@ const std::string program_name = ("GLSL shaders & uniforms");
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void loadWalls(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &wall);
+void loadWalls(glm::mat4 &model, Shader &shader, Model &wall);
 void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
-               Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model, unsigned int modelLoc) ;
+               Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model) ;
 
-void loadCoins(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &coin, Model &pellet);
+void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet);
 void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
 void pickupsCollision();
 void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
@@ -35,8 +32,8 @@ void RenderText(Shader shaderProgram,std::string text, float x, float y, float s
 float distance(float x1, float x2);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 800;
+const unsigned int SCR_WIDTH = 960;
+const unsigned int SCR_HEIGHT = 540;
 
 glm::mat4 view = glm::mat4(1.0f);
 glm::vec3 cameraPos   = glm::vec3(cols/2+0.5f, 0.5f,  rows/2+0.5f);
@@ -45,7 +42,7 @@ glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
 int points = 0;
 float timer = 0;
-float wallSize = 0.1f;
+float wallSize = 0.2f;
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -98,10 +95,10 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    Shader mainShader = Shader("../../../shaders/main.vert","../../../shaders/main.frag");
     Shader textShader = Shader("../../../shaders/text.vert","../../../shaders/text.frag");
     Shader minimapShader("../../../shaders/minimap.vert", "../../../shaders/minimap.frag");
-    Shader modelLoadingShader("../../../shaders/model_loading.vert", "../../../shaders/model_loading.frag");
+    Shader test("../../../shaders/model_loading.vert", "../../../shaders/model_loading.frag");
+    Shader modelLoadingShader("../../../shaders/lighting.vert", "../../../shaders/lighting.frag");
 
 
 
@@ -349,6 +346,9 @@ int main()
     Model clyde("../../../blender objects/ghosts/pacman_ghost_orange.obj");
     Model scaredGhost("../../../blender objects/ghosts/pacman_ghost_scared.obj");
 
+//    unsigned int diffuseMap = loadTexture("../res/textures/container2.png");
+//    unsigned int specularMap = loadTexture("../res/blender-objects/pickups/Solid_white.png");
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -361,21 +361,16 @@ int main()
 
         //FIRST RENDER
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-        unsigned modelLoc= glGetUniformLocation(modelLoadingShader.ID, "model");
-        unsigned viewLoc= glGetUniformLocation(modelLoadingShader.ID, "view");
-        unsigned projLoc= glGetUniformLocation(modelLoadingShader.ID, "projection");
         glEnable(GL_DEPTH_TEST);
 
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        modelLoadingShader.use();
 
         glm::mat4 model = glm::mat4(1.0f);
 
         //cameraPos + cameraFront
         glm::vec3 mCameraPos = glm::vec3(cameraPos.x, 10.0f,  cameraPos.z);
         glm::vec3 mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);;
-        //mCameraFront.x = sin(glm::radians(-90.0f));
         glm::mat4 view2 = glm::lookAt(mCameraPos, mCameraFront + mCameraPos, cameraUp);
 
         glm::mat4 projection2;
@@ -384,21 +379,26 @@ int main()
 
         // retrieve the matrix uniform locations
         // pass them to the shaders (3 different ways)
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view2[0][0]);
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection2[0][0]);
+        modelLoadingShader.use();
+        modelLoadingShader.setMat4("model", model);
+        modelLoadingShader.setMat4("view", view2);
+        modelLoadingShader.setMat4("projection", projection2);
 
         floor.Draw(modelLoadingShader);
 
+        test.use();
+        test.setMat4("model", model);
+        test.setMat4("view", view2);
+        test.setMat4("projection", projection2);
         //load walls
-        loadWalls(model, modelLoc, modelLoadingShader, wall);
+        loadWalls(model, test, wall);
 
         //load ghost
         loadGhost(ghost1, ghost2, ghost3, ghost4,
-                  blinky, pinky, inky, clyde, scaredGhost, modelLoadingShader, model, modelLoc);
+                  blinky, pinky, inky, clyde, scaredGhost, test, model);
 
         //load coins
-        loadCoins(model, modelLoc, modelLoadingShader, coin, pellet);
+        loadCoins(model, test, coin, pellet);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         //FIRST RENDER END
@@ -406,7 +406,7 @@ int main()
 
         //SECOND RENDER
         glEnable(GL_DEPTH_TEST);
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         modelLoadingShader.use();
 
@@ -418,31 +418,62 @@ int main()
         modelLoadingShader.use();
 
         // pass them to the shaders (3 different ways)
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, &projection[0][0]);
+        modelLoadingShader.setMat4("model", model);
+        modelLoadingShader.setMat4("view", view);
+        modelLoadingShader.setMat4("projection", projection);
+
+
+        //lighting
+        modelLoadingShader.use();
+        modelLoadingShader.setVec3("viewPos", cameraPos);
+        modelLoadingShader.setFloat("material.shininess", 32.0f);
+
+        for(int i=0; i < rows; i++){
+            for(int j=0;j< cols;j++){
+                if(grid[i][j].hasCoin){
+                    modelLoadingShader.setVec3("pointLights["+std::to_string(i*10+j)+"].position", glm::vec3( j + 0.5f, 0.15f, i + 0.5f));
+                    modelLoadingShader.setVec3("pointLights["+std::to_string(i*10+j)+"].diffuse", 30.0f, 30.0f, 30.0f);
+                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].constant", 1.0f);
+                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].linear", 100.0f);
+                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].quadratic", 500.0f);
+                }else{
+                    modelLoadingShader.setVec3("pointLights["+std::to_string(i*10+j)+"].position", glm::vec3( j + 0.5f, 0.15f, i + 0.5f));
+                    modelLoadingShader.setVec3("pointLights["+std::to_string(i*10+j)+"].diffuse", 0.0f, 0.0f, 0.0f);
+                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].constant", 1.0f);
+                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].linear", 0.0f);
+                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].quadratic", 0.0f);
+                }
+
+            }
+        }
 
         floor.Draw(modelLoadingShader);
 
         //load walls
-        loadWalls(model, modelLoc, modelLoadingShader, wall);
+        loadWalls(model, modelLoadingShader, wall);
 
         //load ghost
+        test.use();
+        test.setMat4("model", model);
+        test.setMat4("view", view);
+        test.setMat4("projection", projection);
+
         ghost1.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         ghost2.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         ghost3.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         ghost4.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         loadGhost(ghost1, ghost2, ghost3, ghost4,
-                  blinky, pinky, inky, clyde, scaredGhost, modelLoadingShader, model, modelLoc);
+                  blinky, pinky, inky, clyde, scaredGhost, test, model);
 
         //load coins
-        loadCoins(model, modelLoc, modelLoadingShader, coin, pellet);
+        loadCoins(model, test, coin, pellet);
 
+        modelLoadingShader.use();
         ghostScared(ghost1, ghost2, ghost3, ghost4);
         pickupsCollision();
         ghostCollision(ghost1, ghost2, ghost3, ghost4);
         //ui text
-        RenderText(textShader, "Points: "+ to_string(points), 0, SCR_HEIGHT-50, 1.0f, glm::vec3(0.0, 0.0f, 0.0f));
+        RenderText(textShader, "Points: "+ to_string(points), 0, SCR_HEIGHT-50, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
 
         //MINIMAP
         glDisable(GL_DEPTH_TEST);
@@ -497,12 +528,10 @@ void pickupsCollision() {
     if(grid[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin){
         grid[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin = false;
         points += 10;
-        cout<<points<<endl;
     }
     if(grid[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet){
         grid[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet = false;
         points += 10;
-        cout<<points<<endl;
         timer = 5;
     }
 }
@@ -530,14 +559,14 @@ void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) 
     }
 }
 
-void loadCoins(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &coin, Model &pellet) {
+void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet) {
     for(int i=0; i < rows; i++){
         for(int j=0;j<cols;j++){
             if(grid[i][j].hasCoin){
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
                 model = glm::scale(model, glm::vec3( 0.08f, 0.08f, 0.08f));
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                shader.setMat4("model", model);
                 coin.Draw(shader);
             }
 
@@ -545,7 +574,7 @@ void loadCoins(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &c
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
                 model = glm::scale(model, glm::vec3( 0.08f, 0.08f, 0.08f));
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                shader.setMat4("model", model);
                 pellet.Draw(shader);
             }
         }
@@ -553,7 +582,7 @@ void loadCoins(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &c
 }
 
 void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
-               Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model, unsigned int modelLoc) {
+               Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model) {
     float scale = 0.2f;
 
     //red
@@ -561,8 +590,7 @@ void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
     model = glm::translate(model, glm::vec3( ghost1.position.x  + 0.5f, 0.3f, ghost1.position.z + 0.5f));
     model = glm::rotate(model, glm::radians(ghost1.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    cout<<ghost1.rotation<<endl;
+    shader.setMat4("model", model);
     if(ghost1.isScared)
         scared.Draw(shader);
     else
@@ -573,7 +601,7 @@ void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
     model = glm::translate(model, glm::vec3( ghost2.position.x + 0.5f, 0.3f, ghost2.position.z + 0.5f));
     model = glm::rotate(model, glm::radians(ghost2.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    shader.setMat4("model", model);
     if(ghost2.isScared)
         scared.Draw(shader);
     else
@@ -584,7 +612,7 @@ void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
     model = glm::translate(model, glm::vec3( ghost3.position.x + 0.5f, 0.3f, ghost3.position.z + 0.5f));
     model = glm::rotate(model, glm::radians(ghost3.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    shader.setMat4("model", model);
     if(ghost3.isScared)
         scared.Draw(shader);
     else
@@ -595,14 +623,14 @@ void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
     model = glm::translate(model, glm::vec3( ghost4.position.x + 0.5f, 0.3f, ghost4.position.z + 0.5f));
     model = glm::rotate(model, glm::radians(ghost4.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    shader.setMat4("model", model);
     if(ghost4.isScared)
         scared.Draw(shader);
     else
         clyde.Draw(shader);
 }
 
-void loadWalls(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &wall) {
+void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
     float scale = 0.132f;
     for(int i=0;i<rows;i++){
         for(int j=0;j<cols;j++){
@@ -610,14 +638,16 @@ void loadWalls(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &w
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3((float)(j+1), 0.05f, (float)i+0.6f));
                 model = glm::scale(model, glm::vec3( scale, scale, scale));
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                shader.setMat4("model", model);
+//                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 wall.Draw(shader);
             }
             if(grid[i][j].wallLeft){
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3((float)(j), 0.05f, (float)i+0.6f));
                 model = glm::scale(model, glm::vec3( scale, scale, scale));
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                shader.setMat4("model", model);
+//                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 wall.Draw(shader);
             }
             if(grid[i][j].wallUp){
@@ -625,7 +655,8 @@ void loadWalls(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &w
                 model = glm::translate(model, glm::vec3((float)(j)+0.5f, 0.05f, (float)i+0.1));
                 model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
                 model = glm::scale(model, glm::vec3( scale, scale, scale));
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+                shader.setMat4("model", model);
+//                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 wall.Draw(shader);
             }
         }
@@ -635,7 +666,8 @@ void loadWalls(glm::mat4 &model, unsigned int modelLoc, Shader &shader, Model &w
         model = glm::translate(model, glm::vec3((float)(j)+0.5f, 0.05f, rows));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
         model = glm::scale(model, glm::vec3( scale, scale, scale));
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        shader.setMat4("model", model);
+//        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         wall.Draw(shader);
     }
 
