@@ -11,7 +11,6 @@
 class Ghost{
 private:
     BFS algorithm;
-    float moveSpeed;
     float moved;
     glm::vec3 moveToPosition;
     glm::vec3 positionBeforeMove;
@@ -23,7 +22,6 @@ public:
     float rotation;
 
     Ghost(glm::vec3 pos, int V){
-        moveSpeed = 10.0f;
         positionBeforeMove = pos;
         moveToPosition = pos;
         moved = 1;

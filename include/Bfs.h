@@ -1,19 +1,10 @@
-//
-// Created by drist on 8/27/2023.
-//
-
 #ifndef OPENGLPRJ_BFS_H
 #define OPENGLPRJ_BFS_H
-
-// C++ code to print BFS traversal from a given
-// source vertex
 
 #include <stack>
 #include "Maze.h"
 using namespace std;
 
-// This class represents a directed graph using
-// adjacency list representation
 class BFS {
 
     // No. of vertices
@@ -34,38 +25,29 @@ class BFS {
 
 public:
 
-
-
     BFS(){
         this->V = 0;
         adj.resize(V);
     };
-    // Constructor
+
     BFS(int V){
         this->V = V;
         adj.resize(V);
-        //(0,1) == 0+1*10; (2,3) = 2+3*10
         for(int i=0;i<rows;i++){
             for(int j=0;j<cols;j++){
-                //cout<<grid[i][j].wallDown<<" ";
                 if(isValid(i-1,j) && !grid[i][j].wallUp){
-                    //cout<<"ADD: "<<j+i*cols<<" "<<j+(i-1)*cols<<endl;
                     addEdge(j+i*cols,j+(i-1)*cols);
                 }
                 if(isValid(i+1,j) && !grid[i][j].wallDown){
-                    //cout<<"ADD: "<<j+i*cols<<" "<<j+(i+1)*cols<<endl;
                     addEdge(j+i*cols,j+(i+1)*cols);
                 }
                 if(isValid(i,j-1) && !grid[i][j].wallLeft){
-                    //cout<<"ADD: "<<j+i*cols<<" "<<(j-1)+(i)*cols<<endl;
                     addEdge(j+i*cols,(j-1)+(i)*cols);
                 }
                 if(isValid(i,j+1) && !grid[i][j].wallRight){
-                    //cout<<"ADD: "<<j+i*cols<<" "<<(j+1)+(i)*cols<<endl;
                     addEdge(j+i*cols,(j+1)+(i)*cols);
                 }
             }
-            // cout<<endl;
         }
     }
 
@@ -93,7 +75,6 @@ public:
 
     // Function to add an edge to graph
     void addEdge(int v, int w){
-        // Add w to v’s list.
         adj[v].push_back(w);
     }
 
@@ -130,10 +111,7 @@ public:
         }
 
         // printing the path.
-        //cout << source;
         while(!st.empty()) {
-            //int num = st.top();
-            //cout << " -> (" << num%cols<<", "<<num/cols<<")";
             path.push_back(st.top());
             st.pop();
         }

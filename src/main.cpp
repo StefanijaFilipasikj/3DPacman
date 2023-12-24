@@ -36,6 +36,7 @@ const unsigned int SCR_WIDTH = 960;
 const unsigned int SCR_HEIGHT = 540;
 
 glm::mat4 view = glm::mat4(1.0f);
+//position camera in the centre of the maze
 glm::vec3 cameraPos   = glm::vec3(cols/2+0.5f, 0.5f,  rows/2+0.5f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
@@ -55,7 +56,7 @@ struct Character {
 };
 
 std::map<GLchar, Character> Characters;
-unsigned int VBO2, VAO2;
+unsigned int VBO, VAO;
 
 int main()
 {
@@ -97,8 +98,8 @@ int main()
 
     Shader textShader = Shader("../../../shaders/text.vert","../../../shaders/text.frag");
     Shader minimapShader("../../../shaders/minimap.vert", "../../../shaders/minimap.frag");
-    Shader test("../../../shaders/model_loading.vert", "../../../shaders/model_loading.frag");
-    Shader modelLoadingShader("../../../shaders/lighting.vert", "../../../shaders/lighting.frag");
+    Shader modelShader("../../../shaders/model_loading.vert", "../../../shaders/model_loading.frag");
+    Shader lightingModelShader("../../../shaders/lighting.vert", "../../../shaders/lighting.frag");
 
 
 
@@ -183,72 +184,7 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float wallX[] = {
-            // positions         // colors
-            wallSize, 0.0f, 1.0f,    // bottom right red
-            wallSize,  1.0f, 1.0f,     // top right blue
-            0.0f, 0.0f, 1.0f,    // bottom left green
-            0.0f,  1.0f, 1.0f,     // top left yellow
-
-            0.0f, 0.0f, 0.0f,    // bottom left back violet
-            0.0f,  1.0f, 0.0f,     // top left back pink
-
-            wallSize, 0.0f, 0.0f,    // bottom right back orange
-            wallSize,  1.0f, 0.0f,     // top right back cyan
-
-            wallSize, 0.0f, 1.0f,    // bottom right red
-            wallSize,  1.0f, 1.0f,     // top right blue
-
-            wallSize,  1.0f, 1.0f,     // top right blue
-            0.0f,  1.0f, 1.0f,     // top left yellow
-            wallSize,  1.0f, 0.0f,    // top right back cyan
-            0.0f,  1.0f, 0.0f,    // top left back pink
-
-            wallSize, 0.0f, 1.0f,    // bottom right red
-            0.0f, 0.0f, 1.0f,   // bottom left green
-            wallSize, 0.0f, 0.0f,     // bottom right back orange
-            0.0f, 0.0f, 0.0f,     // bottom left back violet
-    };
-
-    float square[] = {
-            // positions         // colors
-            0.5f, 0.0f, 0.5f,    // bottom right red
-            0.5f,  0.5f, 0.5f,     // top right blue
-            0.0f, 0.0f, 0.5f,    // bottom left green
-            0.0f,  0.5f, 0.5f,     // top left yellow
-
-            0.0f, 0.0f, 0.0f,    // bottom left back violet
-            0.0f,  0.5f, 0.0f,     // top left back pink
-
-            0.5f, 0.0f, 0.0f,    // bottom right back orange
-            0.5f,  0.5f, 0.0f,     // top right back cyan
-
-            0.5f, 0.0f, 0.5f,    // bottom right red
-            0.5f,  0.5f, 0.5f,     // top right blue
-
-            0.5f,  0.5f, 0.5f,     // top right blue
-            0.0f,  0.5f, 0.5f,     // top left yellow
-            0.5f,  0.5f, 0.0f,    // top right back cyan
-            0.0f,  0.5f, 0.0f,    // top left back pink
-
-            0.5f, 0.0f, 0.5f,    // bottom right red
-            0.0f, 0.0f, 0.5f,   // bottom left green
-            0.5f, 0.0f, 0.0f,     // bottom right back orange
-            0.0f, 0.0f, 0.0f,     // bottom left back violet
-    };
-
-    float floorX[] = {
-            0.0f,0.0f,0.0f,
-            10.0f,0.0f,0.0f,
-            0.0f,0.0f,10.0f,
-            10.0f,0.0f,10.0f
-    };
-
     float minimap[] = {
-            /*-0.5,0.5f, 1.0f, 0.0f,   // bottom right
-            -0.5f,1.0f, 1.0f, 1.0f,   // top right
-            -1.0f,0.5f, 0.0f, 0.0f,   // bottom left
-            -1.0f, 1.0f, 0.0f, 1.0f    // top left*/
             0.5f, 1.0f, 0.0f, 1.0f,
             0.5f,0.5f, 0.0f, 0.0f,
             1.0f,0.5f, 1.0f, 0.0f,
@@ -258,29 +194,11 @@ int main()
             1.0f,1.0f, 1.0f, 1.0f,
     };
 
-    std::vector<float> vertices;
-    for(float f : floorX)
-        vertices.push_back(f);
-    for(float f : wallX)
-        vertices.push_back(f);
-    for(float f : square)
-        vertices.push_back(f);
-
-    unsigned int VBO, VAO;
+    //for ui text
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), &vertices[0], GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(VAO);
-
-    //for ui text
-    glGenVertexArrays(1, &VAO2);
-    glGenBuffers(1, &VBO2);
-    glBindVertexArray(VAO2);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO2);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
@@ -346,9 +264,6 @@ int main()
     Model clyde("../../../blender objects/ghosts/pacman_ghost_orange.obj");
     Model scaredGhost("../../../blender objects/ghosts/pacman_ghost_scared.obj");
 
-//    unsigned int diffuseMap = loadTexture("../res/textures/container2.png");
-//    unsigned int specularMap = loadTexture("../res/blender-objects/pickups/Solid_white.png");
-
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -379,26 +294,26 @@ int main()
 
         // retrieve the matrix uniform locations
         // pass them to the shaders (3 different ways)
-        modelLoadingShader.use();
-        modelLoadingShader.setMat4("model", model);
-        modelLoadingShader.setMat4("view", view2);
-        modelLoadingShader.setMat4("projection", projection2);
+        lightingModelShader.use();
+        lightingModelShader.setMat4("model", model);
+        lightingModelShader.setMat4("view", view2);
+        lightingModelShader.setMat4("projection", projection2);
 
-        floor.Draw(modelLoadingShader);
+        floor.Draw(lightingModelShader);
 
-        test.use();
-        test.setMat4("model", model);
-        test.setMat4("view", view2);
-        test.setMat4("projection", projection2);
+        modelShader.use();
+        modelShader.setMat4("model", model);
+        modelShader.setMat4("view", view2);
+        modelShader.setMat4("projection", projection2);
         //load walls
-        loadWalls(model, test, wall);
+        loadWalls(model, modelShader, wall);
 
         //load ghost
         loadGhost(ghost1, ghost2, ghost3, ghost4,
-                  blinky, pinky, inky, clyde, scaredGhost, test, model);
+                  blinky, pinky, inky, clyde, scaredGhost, modelShader, model);
 
         //load coins
-        loadCoins(model, test, coin, pellet);
+        loadCoins(model, modelShader, coin, pellet);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         //FIRST RENDER END
@@ -408,79 +323,79 @@ int main()
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        modelLoadingShader.use();
+        lightingModelShader.use();
 
         model = glm::mat4(1.0f);
 
         view = glm::lookAt(cameraPos, cameraFront + cameraPos, cameraUp);
         projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
 
-        modelLoadingShader.use();
+        lightingModelShader.use();
 
         // pass them to the shaders (3 different ways)
-        modelLoadingShader.setMat4("model", model);
-        modelLoadingShader.setMat4("view", view);
-        modelLoadingShader.setMat4("projection", projection);
+        lightingModelShader.setMat4("model", model);
+        lightingModelShader.setMat4("view", view);
+        lightingModelShader.setMat4("projection", projection);
 
 
         //lighting
-        modelLoadingShader.use();
-        modelLoadingShader.setVec3("viewPos", cameraPos);
-        modelLoadingShader.setFloat("material.shininess", 32.0f);
+        lightingModelShader.use();
+        lightingModelShader.setVec3("viewPos", cameraPos);
+        lightingModelShader.setFloat("material.shininess", 32.0f);
 
         for(int i=0; i < rows; i++){
             for(int j=0;j< cols;j++){
                 if(grid[i][j].hasCoin){
-                    modelLoadingShader.setVec3("pointLights["+std::to_string(i*10+j)+"].position", glm::vec3( j + 0.5f, 0.15f, i + 0.5f));
-                    modelLoadingShader.setVec3("pointLights["+std::to_string(i*10+j)+"].diffuse", 30.0f, 30.0f, 30.0f);
-                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].constant", 1.0f);
-                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].linear", 100.0f);
-                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].quadratic", 500.0f);
+                    lightingModelShader.setVec3("pointLights["+std::to_string(i*10+j)+"].position", glm::vec3( j + 0.5f, 0.15f, i + 0.5f));
+                    lightingModelShader.setVec3("pointLights["+std::to_string(i*10+j)+"].diffuse", 30.0f, 30.0f, 30.0f);
+                    lightingModelShader.setFloat("pointLights["+std::to_string(i*10+j)+"].constant", 1.0f);
+                    lightingModelShader.setFloat("pointLights["+std::to_string(i*10+j)+"].linear", 100.0f);
+                    lightingModelShader.setFloat("pointLights["+std::to_string(i*10+j)+"].quadratic", 500.0f);
                 }else{
-                    modelLoadingShader.setVec3("pointLights["+std::to_string(i*10+j)+"].position", glm::vec3( j + 0.5f, 0.15f, i + 0.5f));
-                    modelLoadingShader.setVec3("pointLights["+std::to_string(i*10+j)+"].diffuse", 0.0f, 0.0f, 0.0f);
-                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].constant", 1.0f);
-                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].linear", 0.0f);
-                    modelLoadingShader.setFloat("pointLights["+std::to_string(i*10+j)+"].quadratic", 0.0f);
+                    lightingModelShader.setVec3("pointLights["+std::to_string(i*10+j)+"].position", glm::vec3( j + 0.5f, 0.15f, i + 0.5f));
+                    lightingModelShader.setVec3("pointLights["+std::to_string(i*10+j)+"].diffuse", 0.0f, 0.0f, 0.0f);
+                    lightingModelShader.setFloat("pointLights["+std::to_string(i*10+j)+"].constant", 1.0f);
+                    lightingModelShader.setFloat("pointLights["+std::to_string(i*10+j)+"].linear", 0.0f);
+                    lightingModelShader.setFloat("pointLights["+std::to_string(i*10+j)+"].quadratic", 0.0f);
                 }
 
             }
         }
 
         // spotLight
-        modelLoadingShader.setVec3("spotLight.position", cameraPos);
-        modelLoadingShader.setVec3("spotLight.direction", cameraFront);
-        modelLoadingShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-        modelLoadingShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-        modelLoadingShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-        modelLoadingShader.setFloat("spotLight.constant", 1.0f);
-        modelLoadingShader.setFloat("spotLight.linear", 0.09f);
-        modelLoadingShader.setFloat("spotLight.quadratic", 0.032f);
-        modelLoadingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-        modelLoadingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(25.0f)));
+        lightingModelShader.setVec3("spotLight.position", cameraPos);
+        lightingModelShader.setVec3("spotLight.direction", cameraFront);
+        lightingModelShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+        lightingModelShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+        lightingModelShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+        lightingModelShader.setFloat("spotLight.constant", 1.0f);
+        lightingModelShader.setFloat("spotLight.linear", 0.09f);
+        lightingModelShader.setFloat("spotLight.quadratic", 0.032f);
+        lightingModelShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+        lightingModelShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(25.0f)));
 
-        floor.Draw(modelLoadingShader);
+        floor.Draw(lightingModelShader);
 
         //load walls
-        loadWalls(model, modelLoadingShader, wall);
+        loadWalls(model, lightingModelShader, wall);
 
         //load ghost
-        test.use();
-        test.setMat4("model", model);
-        test.setMat4("view", view);
-        test.setMat4("projection", projection);
+        modelShader.use();
+        modelShader.setMat4("model", model);
+        modelShader.setMat4("view", view);
+        modelShader.setMat4("projection", projection);
 
         ghost1.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         ghost2.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         ghost3.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         ghost4.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         loadGhost(ghost1, ghost2, ghost3, ghost4,
-                  blinky, pinky, inky, clyde, scaredGhost, test, model);
+                  blinky, pinky, inky, clyde, scaredGhost, modelShader, model);
 
         //load coins
-        loadCoins(model, test, coin, pellet);
+        loadCoins(model, modelShader, coin, pellet);
 
-        modelLoadingShader.use();
+        lightingModelShader.use();
         ghostScared(ghost1, ghost2, ghost3, ghost4);
         pickupsCollision();
         ghostCollision(ghost1, ghost2, ghost3, ghost4);
@@ -504,11 +419,10 @@ int main()
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &quadVAO);
     glDeleteBuffers(1, &quadVBO);
-    glDeleteVertexArrays(1, &VAO2);
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
     glDeleteFramebuffersEXT(1, &fbo);
     glDeleteTextures(1, &img);
     glDeleteRenderbuffers(1, &depthbuffer);
@@ -651,7 +565,6 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
                 model = glm::translate(model, glm::vec3((float)(j+1), 0.05f, (float)i+0.6f));
                 model = glm::scale(model, glm::vec3( scale, scale, scale));
                 shader.setMat4("model", model);
-//                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 wall.Draw(shader);
             }
             if(grid[i][j].wallLeft){
@@ -659,7 +572,6 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
                 model = glm::translate(model, glm::vec3((float)(j), 0.05f, (float)i+0.6f));
                 model = glm::scale(model, glm::vec3( scale, scale, scale));
                 shader.setMat4("model", model);
-//                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 wall.Draw(shader);
             }
             if(grid[i][j].wallUp){
@@ -668,7 +580,6 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
                 model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
                 model = glm::scale(model, glm::vec3( scale, scale, scale));
                 shader.setMat4("model", model);
-//                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 wall.Draw(shader);
             }
         }
@@ -679,7 +590,6 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
         model = glm::scale(model, glm::vec3( scale, scale, scale));
         shader.setMat4("model", model);
-//        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         wall.Draw(shader);
     }
 
@@ -692,7 +602,7 @@ void RenderText(Shader shaderProgram,std::string text, float x, float y, float s
     shaderProgram.use();
     glUniform3f(glGetUniformLocation(shaderProgram.ID, "textColor"), color.x, color.y, color.z);
     glActiveTexture(GL_TEXTURE0);
-    glBindVertexArray(VAO2);
+    glBindVertexArray(VAO);
 
     // iterate through all characters
     std::string::const_iterator c;
@@ -718,7 +628,7 @@ void RenderText(Shader shaderProgram,std::string text, float x, float y, float s
         // render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
         // update content of VBO memory
-        glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);

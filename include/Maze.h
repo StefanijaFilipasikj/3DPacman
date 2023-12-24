@@ -1,7 +1,3 @@
-//
-// Created by drist on 8/25/2023.
-//
-
 #ifndef OPENGLPRJ_MAZE_H
 #define OPENGLPRJ_MAZE_H
 
@@ -18,8 +14,6 @@ const int rows = 10;
 const int cols = 10;
 
 vector<vector<Cell>> grid(rows, vector<Cell>(cols));
-
-
 
 class Maze {
 public:
@@ -40,15 +34,8 @@ public:
                 grid[i][j].hasPellet = false;
             }
         }
-        grid[0][0].hasCoin = false;
-        grid[0][cols-1].hasCoin = false;
-        grid[rows-1][0].hasCoin = false;
-        grid[rows-1][cols-1].hasCoin = false;
-        grid[2][2].hasCoin = false;
-        grid[2][cols-3].hasCoin = false;
-        grid[rows-3][2].hasCoin = false;
-        grid[rows-3][cols-3].hasCoin = false;
 
+        //add pellets
         grid[0][0].hasPellet = true;
         grid[0][cols-1].hasPellet = true;
         grid[rows-1][0].hasPellet = true;
@@ -57,9 +44,16 @@ public:
         grid[2][cols-3].hasPellet = true;
         grid[rows-3][2].hasPellet = true;
         grid[rows-3][cols-3].hasPellet = true;
-    }
-    vector<vector<Cell>> getGrid(){
-        return grid;
+
+        //delete coins on cells that have pellets
+        grid[0][0].hasCoin = false;
+        grid[0][cols-1].hasCoin = false;
+        grid[rows-1][0].hasCoin = false;
+        grid[rows-1][cols-1].hasCoin = false;
+        grid[2][2].hasCoin = false;
+        grid[2][cols-3].hasCoin = false;
+        grid[rows-3][2].hasCoin = false;
+        grid[rows-3][cols-3].hasCoin = false;
     }
 
     bool isValid(int row, int col) {
@@ -72,7 +66,7 @@ public:
 
     bool contains(vector<pair<int, int>> walls, int row, int col){
         for(pair<int,int> wall: walls)
-            if(wall.first==row&&wall.second==col)
+            if(wall.first==row && wall.second==col)
                 return true;
         return false;
     }
