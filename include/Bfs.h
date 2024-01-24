@@ -24,10 +24,12 @@ class BFS {
     }
 
 public:
+    static bool GAMEOVER;
 
     BFS(){
         this->V = 0;
         adj.resize(V);
+        GAMEOVER = false;
     };
 
     BFS(int V){
@@ -100,7 +102,7 @@ public:
 
         // BFS returns false means destination is not reachable.
         if(Run_BFS(source, dest, parent) == false) {
-            cout << "Destination is not reachable from this source.\n";
+            GAMEOVER = true;
             return path;
         }
 

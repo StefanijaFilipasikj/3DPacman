@@ -15,7 +15,7 @@
 #include FT_FREETYPE_H
 
 
-const std::string program_name = ("GLSL shaders & uniforms");
+const std::string program_name = ("3D PACMAN");
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -30,10 +30,11 @@ void pickupsCollision();
 void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
 void RenderText(Shader shaderProgram,std::string text, float x, float y, float scale, glm::vec3 color);
 float distance(float x1, float x2);
+void startGame();
 
 // settings
-const unsigned int SCR_WIDTH = 960;
-const unsigned int SCR_HEIGHT = 540;
+const unsigned int SCR_WIDTH = 985;
+const unsigned int SCR_HEIGHT = 700;
 
 glm::mat4 view = glm::mat4(1.0f);
 //position camera in the centre of the maze
@@ -57,6 +58,15 @@ struct Character {
 
 std::map<GLchar, Character> Characters;
 unsigned int VBO, VAO;
+
+//Game objects
+Ghost ghost1;
+Ghost ghost2;
+Ghost ghost3;
+Ghost ghost4;
+Maze maze;
+
+bool BFS::GAMEOVER = false;
 
 int main()
 {
@@ -244,15 +254,6 @@ int main()
     //hide the cursor
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    Maze maze = Maze();
-    maze.generateMaze();
-    maze.printMaze();
-
-    Ghost ghost1 = Ghost(glm::vec3(0.0f,0.0f,0.0f), cols*rows);
-    Ghost ghost2 = Ghost(glm::vec3(cols-1,0.0f,rows-1), cols*rows);
-    Ghost ghost3 = Ghost(glm::vec3(cols-1,0.0f,0.0f), cols*rows);
-    Ghost ghost4 = Ghost(glm::vec3(0.0f,0.0f,rows-1), cols*rows);
-
     Model floor("../../../blender objects/colliders/pacman_floor.obj");
     Model wall("../../../blender objects/colliders/pacman_wall.obj");
     Model coin("../../../blender objects/pickups/pacman_ball.obj");
@@ -263,6 +264,8 @@ int main()
     Model inky("../../../blender objects/ghosts/pacman_ghost_blue.obj");
     Model clyde("../../../blender objects/ghosts/pacman_ghost_orange.obj");
     Model scaredGhost("../../../blender objects/ghosts/pacman_ghost_scared.obj");
+
+    startGame();
 
     // render loop
     // -----------
@@ -385,10 +388,13 @@ int main()
         modelShader.setMat4("view", view);
         modelShader.setMat4("projection", projection);
 
-        ghost1.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
-        ghost2.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
-        ghost3.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
-        ghost4.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+        if(!BFS::GAMEOVER){
+            ghost1.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+            ghost2.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+            ghost3.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+            ghost4.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+        }
+
         loadGhost(ghost1, ghost2, ghost3, ghost4,
                   blinky, pinky, inky, clyde, scaredGhost, modelShader, model);
 
@@ -399,8 +405,18 @@ int main()
         ghostScared(ghost1, ghost2, ghost3, ghost4);
         pickupsCollision();
         ghostCollision(ghost1, ghost2, ghost3, ghost4);
-        //ui text
-        RenderText(textShader, "Points: "+ to_string(points), 0, SCR_HEIGHT-50, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
+
+        if(!BFS::GAMEOVER){
+            RenderText(textShader, "Points: "+ to_string(points), 0, SCR_HEIGHT-50, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
+        }else{
+            if(points == 1000){
+                RenderText(textShader, "CONGRATS", int(SCR_WIDTH/4.5), int(SCR_HEIGHT/2), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
+                RenderText(textShader, "YOU WON!", int(SCR_WIDTH/3.5), int(SCR_HEIGHT/3), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
+            }else{
+                RenderText(textShader, "GAME OVER", int(SCR_WIDTH/4.5), int(SCR_HEIGHT/2), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
+                RenderText(textShader, "PRESS ENTER TO RESTART", 0, int(SCR_HEIGHT/3), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
+            }
+        }
 
         //MINIMAP
         glDisable(GL_DEPTH_TEST);
@@ -433,6 +449,21 @@ int main()
     return 0;
 }
 
+void startGame(){
+    maze = Maze();
+    maze.generateMaze();
+    maze.printMaze();
+    points = 0;
+
+    ghost1 = Ghost(glm::vec3(0.0f,0.0f,0.0f), cols*rows);
+    ghost2 = Ghost(glm::vec3(cols-1,0.0f,rows-1), cols*rows);
+    ghost3 = Ghost(glm::vec3(cols-1,0.0f,0.0f), cols*rows);
+    ghost4 = Ghost(glm::vec3(0.0f,0.0f,rows-1), cols*rows);
+
+    cameraPos   = glm::vec3(cols/2+0.5f, 0.5f,  rows/2+0.5f);
+
+}
+
 void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) {
     if(timer > 0){
         timer-=deltaTime;
@@ -459,6 +490,9 @@ void pickupsCollision() {
         grid[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet = false;
         points += 10;
         timer = 5;
+    }
+    if(points == 1000){
+        BFS::GAMEOVER = true;
     }
 }
 
@@ -650,14 +684,21 @@ void processInput(GLFWwindow *window)
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront * camera;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront * camera;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront * camera, cameraUp)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront * camera, cameraUp)) * cameraSpeed;
+    if(!BFS::GAMEOVER){
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            cameraPos += cameraSpeed * cameraFront * camera;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            cameraPos -= cameraSpeed * cameraFront * camera;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            cameraPos -= glm::normalize(glm::cross(cameraFront * camera, cameraUp)) * cameraSpeed;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            cameraPos += glm::normalize(glm::cross(cameraFront * camera, cameraUp)) * cameraSpeed;
+    }
+
+    if(BFS::GAMEOVER){
+        if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+            startGame();
+    }
 
     //wall collisions
     if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallUp && distance(cameraPos.z,glm::floor(cameraPos.z)) <= wallSize)

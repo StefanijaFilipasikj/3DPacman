@@ -16,10 +16,13 @@ private:
     glm::vec3 positionBeforeMove;
     vector<int> path;
 
+
 public:
     glm::vec3 position;
     bool isScared;
     float rotation;
+
+    Ghost() {}
 
     Ghost(glm::vec3 pos, int V){
         positionBeforeMove = pos;
@@ -35,10 +38,10 @@ public:
 
             moveToPosition.x = path[0]%cols;
             moveToPosition.z = path[0]/cols;
-            moved += deltaTime;
+            moved += deltaTime / 2;
 
-            position.x += (moveToPosition.x - positionBeforeMove.x)*deltaTime;
-            position.z += (moveToPosition.z - positionBeforeMove.z)*deltaTime;
+            position.x += (moveToPosition.x - positionBeforeMove.x)*deltaTime/2;
+            position.z += (moveToPosition.z - positionBeforeMove.z)*deltaTime/2;
 
             if(moveToPosition.x - positionBeforeMove.x != 0){
                 if(moveToPosition.x - positionBeforeMove.x > 0)
