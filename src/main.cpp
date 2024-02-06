@@ -44,7 +44,7 @@ glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
 int points = 0;
 float timer = 0;
-float wallSize = 0.2f;
+float wallSize = 0.3f;
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -259,6 +259,7 @@ int main()
     Model coin("../../../blender objects/pickups/pacman_ball.obj");
     Model pellet("../../../blender objects/pickups/pacman_powerup.obj");
 
+    Model pacman("../../../blender objects/ghosts/player.obj");
     Model blinky("../../../blender objects/ghosts/pacman_ghost_red.obj");
     Model pinky("../../../blender objects/ghosts/pacman_ghost_pink.obj");
     Model inky("../../../blender objects/ghosts/pacman_ghost_blue.obj");
@@ -308,6 +309,14 @@ int main()
         modelShader.setMat4("model", model);
         modelShader.setMat4("view", view2);
         modelShader.setMat4("projection", projection2);
+
+        //load player
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(cameraPos.x, 1.0f, cameraPos.z));
+        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+        modelShader.setMat4("model", model);
+        pacman.Draw(modelShader);
+
         //load walls
         loadWalls(model, modelShader, wall);
 
