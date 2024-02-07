@@ -28,7 +28,7 @@ void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet);
 void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
 void pickupsCollision();
 void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
-void RenderText(Shader shaderProgram,std::string text, float x, float y, float scale, glm::vec3 color);
+void RenderText(Shader shaderProgram,std::string text, std::string text_position_x, float y, float scale, glm::vec3 color);
 float distance(float x1, float x2);
 void startGame();
 
@@ -288,7 +288,14 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
 
         //cameraPos + cameraFront
-        glm::vec3 mCameraPos = glm::vec3(cameraPos.x, 10.0f,  cameraPos.z);
+        glm::vec3 mCameraPos;
+        float offset;
+        if(SCR_WIDTH < SCR_HEIGHT){
+            mCameraPos = glm::vec3(5.0f, 16.0f, 5.0f);
+        }else{
+            mCameraPos = glm::vec3(5.0f, 13.0f, 5.0f);
+        }
+
         glm::vec3 mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);;
         glm::mat4 view2 = glm::lookAt(mCameraPos, mCameraFront + mCameraPos, cameraUp);
 
@@ -416,14 +423,14 @@ int main()
         ghostCollision(ghost1, ghost2, ghost3, ghost4);
 
         if(!BFS::GAMEOVER){
-            RenderText(textShader, "Points: "+ to_string(points), 0, SCR_HEIGHT-50, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
+            RenderText(textShader, "Points: "+ to_string(points), "left", SCR_HEIGHT-50, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
         }else{
             if(points == 1000){
-                RenderText(textShader, "CONGRATS", int(SCR_WIDTH/4.5), int(SCR_HEIGHT/2), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
-                RenderText(textShader, "YOU WON!", int(SCR_WIDTH/3.5), int(SCR_HEIGHT/3), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
+                RenderText(textShader, "CONGRATS", "center", int(SCR_HEIGHT/1.8), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
+                RenderText(textShader, "YOU WON!", "center", int(SCR_HEIGHT/2.5), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
             }else{
-                RenderText(textShader, "GAME OVER", int(SCR_WIDTH/4.5), int(SCR_HEIGHT/2), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
-                RenderText(textShader, "PRESS ENTER TO RESTART", 0, int(SCR_HEIGHT/3), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
+                RenderText(textShader, "GAME OVER", "center", int(SCR_HEIGHT/1.8), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
+                RenderText(textShader, "PRESS ENTER TO RESTART", "center", int(SCR_HEIGHT/2.5), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
             }
         }
 
@@ -431,6 +438,17 @@ int main()
         glDisable(GL_DEPTH_TEST);
         glBindTexture(GL_TEXTURE_2D, img);
         minimapShader.use();
+
+        if(SCR_WIDTH < SCR_HEIGHT){
+            offset = (1.0 / ((float)SCR_HEIGHT/(float)SCR_WIDTH) - 1.0) / 2.0;
+            minimapShader.setFloat("offset_x",  0.0f);
+            minimapShader.setFloat("offset_y",  offset);
+        }else{
+            offset = (1.0 / ((float)SCR_WIDTH/(float)SCR_HEIGHT) - 1.0) / 2.0;
+            minimapShader.setFloat("offset_x",  offset);
+            minimapShader.setFloat("offset_y",  0.0f);
+        }
+
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -639,7 +657,7 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
 
 }
 
-void RenderText(Shader shaderProgram,std::string text, float x, float y, float scale, glm::vec3 color)
+void RenderText(Shader shaderProgram,std::string text, std::string text_position_x, float y, float scale, glm::vec3 color)
 {
     // activate corresponding render state
     shaderProgram.use();
@@ -647,8 +665,26 @@ void RenderText(Shader shaderProgram,std::string text, float x, float y, float s
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
+    scale = scale * (SCR_WIDTH / 1000.0f);
+    float x;
+
     // iterate through all characters
     std::string::const_iterator c;
+
+    if(text_position_x == "center")
+    {
+        float text_width = 0.0f;
+        for (c = text.begin(); c != text.end(); c++)
+        {
+            Character ch = Characters[*c];
+            text_width += (ch.Advance >> 6) * scale;
+        }
+        x = SCR_WIDTH/2.0f - text_width/2.0f;
+    }else{
+        //text_position_x == left
+        x = 1.0f;
+    }
+
     for (c = text.begin(); c != text.end(); c++)
     {
         Character ch = Characters[*c];
