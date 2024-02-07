@@ -3,7 +3,7 @@
    http://github.com/nothings/stb
 
    Written with emphasis on usability, portability, and efficiency. (No
-   SIMD or threads, so it be easily outperformed by libs that use those.)
+   SIMD or threads, so it be easily outperformed by openal that use those.)
    Only scaling and translation is supported, no rotations or shears.
    Easy API downsamples w/Mitchell filter, upsamples w/cubic interpolation.
 

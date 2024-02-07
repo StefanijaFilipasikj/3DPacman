@@ -1,6 +1,6 @@
 /*
  * gcc -DFT2_BUILD_LIBRARY -I../../include -o test_afm test_afm.c \
- *     -L../../objs/.libs -lfreetype -lz -static
+ *     -L../../objs/.openal -lfreetype -lz -static
  */
 #include <freetype/freetype.h>
 #include <freetype/internal/ftstream.h>

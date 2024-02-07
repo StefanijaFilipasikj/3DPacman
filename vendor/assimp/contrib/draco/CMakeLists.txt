@@ -754,7 +754,7 @@ if(EMSCRIPTEN AND DRACO_JS_GLUE)
       POST_LINK_JS_SOURCES ${draco_post_link_js_sources})
   endif()
 else()
-  # Standard Draco libs, encoder and decoder. Object collections that mirror the
+  # Standard Draco openal, encoder and decoder. Object collections that mirror the
   # Draco directory structure.
   draco_add_library(
     NAME draco_attributes

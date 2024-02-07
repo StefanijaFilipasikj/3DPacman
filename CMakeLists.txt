@@ -23,7 +23,8 @@ include_directories(include/
                     vendor/glfw/include/
                     vendor/glm/
                     vendor/stb/
-                    vendor/assimp/include)
+                    vendor/assimp/include
+                    vendor/openal/include)
 
 file(GLOB VENDORS_SOURCES vendor/glad/src/glad.c)
 file(GLOB PROJECT_HEADERS include/*.hpp)
@@ -58,4 +59,4 @@ target_link_libraries(${PROJECT_NAME} assimp freetype
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
-#target_link_libraries(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/vendor/freetype/lib/freetype.lib)
+target_link_libraries(${PROJECT_NAME} C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/openal/OpenAL32.lib)

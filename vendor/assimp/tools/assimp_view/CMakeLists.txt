@@ -103,7 +103,7 @@ IF (ASSIMP_WARNINGS_AS_ERRORS)
   ENDIF()
 ENDIF()
 
-# Link the executable to the assimp + dx libs.
+# Link the executable to the assimp + dx openal.
 TARGET_LINK_LIBRARIES ( assimp_viewer assimp ${DirectX_LIBRARY} ${DirectX_D3DX9_LIBRARY} comctl32 winmm )
 
 INSTALL( TARGETS assimp_viewer

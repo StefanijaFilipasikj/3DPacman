@@ -4225,7 +4225,7 @@ func_mode_finish ()
 {
     $debug_cmd
 
-    libs=
+    openal=
     libdirs=
     admincmds=
 
@@ -4236,7 +4236,7 @@ func_mode_finish ()
 
       elif test -f "$opt"; then
 	if func_lalib_unsafe_p "$opt"; then
-	  func_append libs " $opt"
+	  func_append openal " $opt"
 	else
 	  func_warning "'$opt' is not a valid libtool archive"
 	fi
@@ -5170,7 +5170,7 @@ func_cygming_ms_implib_p ()
 # func_win32_libid arg
 # return the library type of file 'arg'
 #
-# Need a lot of goo to handle *both* DLLs and import libs
+# Need a lot of goo to handle *both* DLLs and import openal
 # Has to be a shell function in order to 'eat' the argument
 # that is supplied when $file_magic_command is called.
 # Despite the name, also deal with 64 bit binaries.
@@ -6830,7 +6830,7 @@ func_mode_link ()
 	build_old_libs=no
 	break
 	;;
-      -all-static | -static | -static-libtool-libs)
+      -all-static | -static | -static-libtool-openal)
 	case $arg in
 	-all-static)
 	  if test yes = "$build_libtool_libs" && test -z "$link_static_flag"; then
@@ -6847,7 +6847,7 @@ func_mode_link ()
 	  fi
 	  prefer_static_libs=built
 	  ;;
-	-static-libtool-libs)
+	-static-libtool-openal)
 	  if test -z "$pic_flag" && test -n "$link_static_flag"; then
 	    dlopen_self=$dlopen_self_static
 	  fi
@@ -7450,7 +7450,7 @@ func_mode_link ()
 	continue
 	;;
 
-      -static | -static-libtool-libs)
+      -static | -static-libtool-openal)
 	# The effects of -static are defined in a previous loop.
 	# We used to do the same as -all-static on platforms that
 	# didn't have a PIC flag, but the assumption that the effects
@@ -7771,7 +7771,7 @@ func_mode_link ()
 
     specialdeplibs=
 
-    libs=
+    openal=
     # Find all interdependent deplibs by searching for libraries
     # that are linked more than once (e.g. -la -lb -la)
     for deplib in $deplibs; do
@@ -7780,11 +7780,11 @@ func_mode_link ()
 	*" $deplib "*) func_append specialdeplibs " $deplib" ;;
 	esac
       fi
-      func_append libs " $deplib"
+      func_append openal " $deplib"
     done
 
     if test lib = "$linkmode"; then
-      libs="$predeps $libs $compiler_lib_search_path $postdeps"
+      openal="$predeps $libs $compiler_lib_search_path $postdeps"
 
       # Compute libraries that are listed more than once in $predeps
       # $postdeps and mark them as special (i.e., whose duplicates are
@@ -7834,7 +7834,7 @@ func_mode_link ()
 
     for pass in $passes; do
       # The preopen pass in lib mode reverses $deplibs; put it back here
-      # so that -L comes before libs that need it for instance...
+      # so that -L comes before openal that need it for instance...
       if test lib,link = "$linkmode,$pass"; then
 	## FIXME: Find the place where the list is rebuilt in the wrong
 	##        order, and fix it there properly
@@ -7847,20 +7847,20 @@ func_mode_link ()
 
       if test lib,link = "$linkmode,$pass" ||
 	 test prog,scan = "$linkmode,$pass"; then
-	libs=$deplibs
+	openal=$deplibs
 	deplibs=
       fi
       if test prog = "$linkmode"; then
 	case $pass in
-	dlopen) libs=$dlfiles ;;
-	dlpreopen) libs=$dlprefiles ;;
-	link) libs="$deplibs %DEPLIBS% $dependency_libs" ;;
+	dlopen) openal=$dlfiles ;;
+	dlpreopen) openal=$dlprefiles ;;
+	link) openal="$deplibs %DEPLIBS% $dependency_libs" ;;
 	esac
       fi
       if test lib,dlpreopen = "$linkmode,$pass"; then
-	# Collect and forward deplibs of preopened libtool libs
+	# Collect and forward deplibs of preopened libtool openal
 	for lib in $dlprefiles; do
-	  # Ignore non-libtool-libs
+	  # Ignore non-libtool-openal
 	  dependency_libs=
 	  func_resolve_sysroot "$lib"
 	  case $lib in
@@ -7868,7 +7868,7 @@ func_mode_link ()
 	  esac
 
 	  # Collect preopened libtool deplibs, except any this library
-	  # has declared as weak libs
+	  # has declared as weak openal
 	  for deplib in $dependency_libs; do
 	    func_basename "$deplib"
             deplib_base=$func_basename_result
@@ -7878,7 +7878,7 @@ func_mode_link ()
 	    esac
 	  done
 	done
-	libs=$dlprefiles
+	openal=$dlprefiles
       fi
       if test dlopen = "$pass"; then
 	# Collect dlpreopened libraries
@@ -8823,7 +8823,7 @@ func_mode_link ()
 	    done
 	  fi # link_all_deplibs != no
 	fi # linkmode = lib
-      done # for deplib in $libs
+      done # for deplib in $openal
       if test link = "$pass"; then
 	if test prog = "$linkmode"; then
 	  compile_deplibs="$new_inherited_linker_flags $compile_deplibs"
@@ -8944,7 +8944,7 @@ func_mode_link ()
         esac
       }
 
-      # Last step: remove runtime libs from dependency_libs
+      # Last step: remove runtime openal from dependency_libs
       # (they stay in deplibs)
       tmp_libs=
       for i in $dependency_libs; do

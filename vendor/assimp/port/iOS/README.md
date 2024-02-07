@@ -10,7 +10,7 @@ shadeds-Mac:iOS arul$ ./build.sh --help
 [!] ./build.sh - assimp iOS build script
  - don't build fat library (--no-fat)
  - supported architectures(--archs): armv7, armv7s, arm64, i386, x86_64
- - supported C++ STD libs.(--stdlib): libc++, libstdc++
+ - supported C++ STD openal.(--stdlib): libc++, libstdc++
 ```
 Example:
 ```bash

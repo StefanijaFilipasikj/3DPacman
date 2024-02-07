@@ -29,7 +29,7 @@ does cast doubles to S64s and shifts and divides U64s, which does
 drag in CRT code on most platforms.
 
 It compiles to roughly 8K with float support, and 4K without.
-As a comparison, when using MSVC static libs, calling sprintf drags
+As a comparison, when using MSVC static openal, calling sprintf drags
 in 16K.
 
 API:

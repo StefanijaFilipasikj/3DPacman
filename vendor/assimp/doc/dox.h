@@ -171,7 +171,7 @@ cmake CMakeLists.txt
 @endcode
 
 A project-file of your default make-system ( like gnu-make on linux or Visual-Studio on Windows ) will be generated.
-Run the build and you are done. You can find the libs at assimp/lib and the dll's / so's at bin.
+Run the build and you are done. You can find the openal at assimp/lib and the dll's / so's at bin.
 
 @section assimp_dll Windows DLL Build
 
