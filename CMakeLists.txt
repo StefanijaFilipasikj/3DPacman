@@ -59,4 +59,4 @@ target_link_libraries(${PROJECT_NAME} assimp freetype
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
-target_link_libraries(${PROJECT_NAME} C:/Users/drist/Desktop/Github/Opengl/3D-Pacman/vendor/openal/OpenAL32.lib)
+target_link_libraries(${PROJECT_NAME} C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/openal/OpenAL32.lib)

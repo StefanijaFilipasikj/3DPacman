@@ -12,6 +12,10 @@
 #include <Model.h>
 #include <map>
 #include <assimp/Importer.hpp>
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include FT_FREETYPE_H
 
 
@@ -21,15 +25,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void loadWalls(glm::mat4 &model, Shader &shader, Model &wall);
-void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
-               Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model) ;
-
+void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4, Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model) ;
 void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet);
 void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
-void pickupsCollision();
+void pickupsCollision(ALuint coinSound, ALuint powerUpSound);
 void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
 void RenderText(Shader shaderProgram,std::string text, std::string text_position_x, float y, float scale, glm::vec3 color);
 float distance(float x1, float x2);
+ALboolean loadWavFile(const char *path, ALenum *format, ALvoid **data, ALsizei *size, ALsizei *frequency);
+ALuint loadSound(const char* filePath, ALboolean loop);
 void startGame();
 
 // settings
@@ -67,6 +71,7 @@ Ghost ghost4;
 Maze maze;
 
 bool BFS::GAMEOVER = false;
+bool gameOverSoundPlayed = false;
 
 int main()
 {
@@ -266,6 +271,29 @@ int main()
     Model clyde("../../../blender objects/ghosts/pacman_ghost_orange.obj");
     Model scaredGhost("../../../blender objects/ghosts/pacman_ghost_scared.obj");
 
+
+    // OpenAL initialization
+    ALCdevice *device = alcOpenDevice(NULL);
+    ALCcontext *context = alcCreateContext(device, NULL);
+    alcMakeContextCurrent(context);
+
+    //play game theme
+    ALuint gameThemeSource = loadSound("../../../sounds/sound-game-theme.wav", AL_TRUE);
+    alSourcePlay(gameThemeSource);
+
+    //load coin sound
+    ALuint coinSound = loadSound("../../../sounds/sound-effect-coin.wav", AL_FALSE);
+
+    //load powerUp sound
+    ALuint powerUpSound = loadSound("../../../sounds/sound-effect-power-up.wav", AL_FALSE);
+
+    //load game over - win sound
+    ALuint gameOverSoundWin = loadSound("../../../sounds/sound-effect-game-win.wav", AL_FALSE);
+
+    //load game over - loss sound
+    ALuint gameOverSoundLoss = loadSound("../../../sounds/sound-effect-game-over.wav", AL_FALSE);
+
+
     startGame();
 
     // render loop
@@ -419,7 +447,7 @@ int main()
 
         lightingModelShader.use();
         ghostScared(ghost1, ghost2, ghost3, ghost4);
-        pickupsCollision();
+        pickupsCollision(coinSound, powerUpSound);
         ghostCollision(ghost1, ghost2, ghost3, ghost4);
 
         if(!BFS::GAMEOVER){
@@ -428,9 +456,19 @@ int main()
             if(points == 1000){
                 RenderText(textShader, "CONGRATS", "center", int(SCR_HEIGHT/1.8), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
                 RenderText(textShader, "YOU WON!", "center", int(SCR_HEIGHT/2.5), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
+
+                if(!gameOverSoundPlayed){
+                    alSourcePlay(gameOverSoundWin);
+                    gameOverSoundPlayed = true;
+                }
             }else{
                 RenderText(textShader, "GAME OVER", "center", int(SCR_HEIGHT/1.8), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
                 RenderText(textShader, "PRESS ENTER TO RESTART", "center", int(SCR_HEIGHT/2.5), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
+
+                if(!gameOverSoundPlayed){
+                    alSourcePlay(gameOverSoundLoss);
+                    gameOverSoundPlayed = true;
+                }
             }
         }
 
@@ -508,15 +546,18 @@ void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) {
     }
 }
 
-void pickupsCollision() {
+void pickupsCollision(ALuint coinSound, ALuint powerUpSound) {
     if(grid[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin){
         grid[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin = false;
         points += 10;
+        alSourcePlay(coinSound);
     }
     if(grid[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet){
         grid[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet = false;
         points += 10;
         timer = 5;
+        alSourcePlay(powerUpSound);
+        alSourcePlay(coinSound);
     }
     if(points == 1000){
         BFS::GAMEOVER = true;
@@ -722,6 +763,7 @@ void RenderText(Shader shaderProgram,std::string text, std::string text_position
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
+
 void processInput(GLFWwindow *window)
 {
     float cameraSpeed = 4.0f * deltaTime;
@@ -742,7 +784,10 @@ void processInput(GLFWwindow *window)
 
     if(BFS::GAMEOVER){
         if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+        {
             startGame();
+            gameOverSoundPlayed = false;
+        }
     }
 
     //wall collisions
@@ -755,6 +800,67 @@ void processInput(GLFWwindow *window)
     if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallRight && distance(cameraPos.x,glm::floor(cameraPos.x)+1.0f) <= wallSize)
         cameraPos.x = glm::floor(cameraPos.x)+1.0f-wallSize;
 }
+
+ALboolean loadWavFile(const char *path, ALenum *format, ALvoid **data, ALsizei *size, ALsizei *frequency) {
+    FILE *file = fopen(path, "rb");
+    if (!file) {
+        fprintf(stderr, "Failed to open file: %s\n", path);
+        return AL_FALSE;
+    }
+
+    fseek(file, 0, SEEK_END);
+    *size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    *data = malloc(*size);
+    if (!*data) {
+        fprintf(stderr, "Failed to allocate memory for file data\n");
+        fclose(file);
+        return AL_FALSE;
+    }
+
+    fread(*data, 1, *size, file);
+    fclose(file);
+
+    // Assume a mono, 16-bit PCM WAV file for simplicity
+    *format = AL_FORMAT_MONO16;
+    *frequency = 44100;
+
+    return AL_TRUE;
+}
+
+ALuint loadSound(const char* filePath, ALboolean loop)
+{
+    ALuint soundBuffer, soundSource;
+
+    // Load WAV file
+    ALenum soundFormat;
+    ALvoid* soundData;
+    ALsizei soundSize;
+    ALsizei soundFrequency;
+
+    if (!loadWavFile(filePath, &soundFormat, &soundData, &soundSize, &soundFrequency)) {
+        fprintf(stderr, "Failed to load sound WAV file: %s\n", filePath);
+        return 0;
+    }
+
+    // Generate sound buffer
+    alGenBuffers(1, &soundBuffer);
+    alBufferData(soundBuffer, soundFormat, soundData, soundSize, soundFrequency);
+
+    // Generate sound source
+    alGenSources(1, &soundSource);
+    alSourcei(soundSource, AL_BUFFER, soundBuffer);
+
+    // Set looping property
+    alSourcei(soundSource, AL_LOOPING, loop);
+
+    // Clean up loaded data
+    free(soundData);
+
+    return soundSource;
+}
+
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
