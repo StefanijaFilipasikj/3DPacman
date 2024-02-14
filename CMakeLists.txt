@@ -52,11 +52,19 @@ add_definitions(-DGLFW_INCLUDE_NONE
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${VENDORS_SOURCES} include/Bfs.h)
+
 target_link_libraries(${PROJECT_NAME} assimp freetype
 		      glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
 		      )
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 
-target_link_libraries(${PROJECT_NAME} C:/Users/sfili/Documents/GitHub/3D-Pacman/vendor/openal/OpenAL32.lib)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/vendor/openal/OpenAL32.lib)
+
+add_custom_command(TARGET OpenGLPrj POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_LIST_DIR}/vendor/openal/OpenAL32.dll
+        $<TARGET_FILE_DIR:OpenGLPrj>
+)

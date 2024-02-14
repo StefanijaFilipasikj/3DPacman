@@ -12,44 +12,45 @@ class Ghost{
 private:
     BFS algorithm;
     float moved;
-    glm::vec3 moveToPosition;
-    glm::vec3 positionBeforeMove;
+    glm::vec3 destinationCellPosition;
+    glm::vec3 ghostCellPosition;
     vector<int> path;
 
-
 public:
+    float moveSpeed;
     glm::vec3 position;
     bool isScared;
     float rotation;
 
     Ghost() {}
 
-    Ghost(glm::vec3 pos, int V){
-        positionBeforeMove = pos;
-        moveToPosition = pos;
+    Ghost(glm::vec3 pos){
+        ghostCellPosition = pos;
+        destinationCellPosition = pos;
         moved = 1;
         position = pos;
-        algorithm = BFS(V);
+        algorithm = BFS();
         isScared=false;
+        moveSpeed = 0.5f;
     }
 
     void move(float deltaTime, int dest){
         if(path.size()!=0){
 
-            moveToPosition.x = path[0]%cols;
-            moveToPosition.z = path[0]/cols;
-            moved += deltaTime / 2;
+            destinationCellPosition.x = path[0]%cols;
+            destinationCellPosition.z = path[0]/cols;
+            moved += deltaTime * moveSpeed;
 
-            position.x += (moveToPosition.x - positionBeforeMove.x)*deltaTime/2;
-            position.z += (moveToPosition.z - positionBeforeMove.z)*deltaTime/2;
+            position.x += (destinationCellPosition.x - ghostCellPosition.x)*deltaTime*moveSpeed;
+            position.z += (destinationCellPosition.z - ghostCellPosition.z)*deltaTime*moveSpeed;
 
-            if(moveToPosition.x - positionBeforeMove.x != 0){
-                if(moveToPosition.x - positionBeforeMove.x > 0)
+            if(destinationCellPosition.x - ghostCellPosition.x != 0){
+                if(destinationCellPosition.x - ghostCellPosition.x > 0)
                     rotation = 90.0f;
                 else rotation = 270.0f;
             }
-            if(moveToPosition.z - positionBeforeMove.z != 0){
-                if(moveToPosition.z - positionBeforeMove.z > 0)
+            if(destinationCellPosition.z - ghostCellPosition.z != 0){
+                if(destinationCellPosition.z - ghostCellPosition.z > 0)
                     rotation = 0.0f;
                 else rotation = 180.0f;
             }
@@ -57,14 +58,14 @@ public:
             moved = 1;
         }
         if(moved >= 1){
-            positionBeforeMove = moveToPosition;
-            position = moveToPosition;
+            ghostCellPosition = destinationCellPosition;
+            position = destinationCellPosition;
             moved = 0;
             if(!isScared){
-                path = algorithm.get_path(positionBeforeMove.x + positionBeforeMove.z*cols, dest);
+                path = algorithm.getPath(ghostCellPosition.x + ghostCellPosition.z*cols, dest);
             }else{
                 path = vector<int>();
-                path.push_back(algorithm.getRunningPath(positionBeforeMove.x + positionBeforeMove.z*cols,dest));
+                path.push_back(algorithm.getRunningPath(ghostCellPosition.x + ghostCellPosition.z*cols,dest));
             }
 
         }

@@ -25,11 +25,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void loadWalls(glm::mat4 &model, Shader &shader, Model &wall);
-void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4, Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model) ;
+void loadGhost(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost, Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model) ;
 void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet);
-void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
+void ghostCollision(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost);
 void pickupsCollision(ALuint coinSound, ALuint powerUpSound);
-void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4);
+void ghostScared(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost);
+float getDistance(glm::vec3 pos1, glm::vec3 pos2);
 void RenderText(Shader shaderProgram,std::string text, std::string text_position_x, float y, float scale, glm::vec3 color);
 float distance(float x1, float x2);
 ALboolean loadWavFile(const char *path, ALenum *format, ALvoid **data, ALsizei *size, ALsizei *frequency);
@@ -46,6 +47,7 @@ glm::vec3 cameraPos   = glm::vec3(cols/2+0.5f, 0.5f,  rows/2+0.5f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
+static bool GAMEOVER = false;
 int points = 0;
 float timer = 0;
 float wallSize = 0.3f;
@@ -64,13 +66,12 @@ std::map<GLchar, Character> Characters;
 unsigned int VBO, VAO;
 
 //Game objects
-Ghost ghost1;
-Ghost ghost2;
-Ghost ghost3;
-Ghost ghost4;
-Maze maze;
+Ghost blinkyGhost;
+Ghost pinkyGhost;
+Ghost inkyGhost;
+Ghost clydeGhost;
+Maze mazeClass;
 
-bool BFS::GAMEOVER = false;
 bool gameOverSoundPlayed = false;
 
 int main()
@@ -115,8 +116,6 @@ int main()
     Shader minimapShader("../../../shaders/minimap.vert", "../../../shaders/minimap.frag");
     Shader modelShader("../../../shaders/model_loading.vert", "../../../shaders/model_loading.frag");
     Shader lightingModelShader("../../../shaders/lighting.vert", "../../../shaders/lighting.frag");
-
-
 
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT));
     textShader.use();
@@ -356,7 +355,7 @@ int main()
         loadWalls(model, modelShader, wall);
 
         //load ghost
-        loadGhost(ghost1, ghost2, ghost3, ghost4,
+        loadGhost(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost,
                   blinky, pinky, inky, clyde, scaredGhost, modelShader, model);
 
         //load coins
@@ -392,7 +391,7 @@ int main()
 
         for(int i=0; i < rows; i++){
             for(int j=0;j< cols;j++){
-                if(grid[i][j].hasCoin){
+                if(maze[i][j].hasCoin){
                     lightingModelShader.setVec3("pointLights["+std::to_string(i*10+j)+"].position", glm::vec3( j + 0.5f, 0.15f, i + 0.5f));
                     lightingModelShader.setVec3("pointLights["+std::to_string(i*10+j)+"].diffuse", 30.0f, 30.0f, 30.0f);
                     lightingModelShader.setFloat("pointLights["+std::to_string(i*10+j)+"].constant", 1.0f);
@@ -432,25 +431,25 @@ int main()
         modelShader.setMat4("view", view);
         modelShader.setMat4("projection", projection);
 
-        if(!BFS::GAMEOVER){
-            ghost1.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
-            ghost2.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
-            ghost3.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
-            ghost4.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+        if(!GAMEOVER){
+            blinkyGhost.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+            pinkyGhost.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+            inkyGhost.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
+            clydeGhost.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         }
 
-        loadGhost(ghost1, ghost2, ghost3, ghost4,
+        loadGhost(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost,
                   blinky, pinky, inky, clyde, scaredGhost, modelShader, model);
 
         //load coins
         loadCoins(model, modelShader, coin, pellet);
 
         lightingModelShader.use();
-        ghostScared(ghost1, ghost2, ghost3, ghost4);
+        ghostScared(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost);
         pickupsCollision(coinSound, powerUpSound);
-        ghostCollision(ghost1, ghost2, ghost3, ghost4);
+        ghostCollision(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost);
 
-        if(!BFS::GAMEOVER){
+        if(!GAMEOVER){
             RenderText(textShader, "Points: "+ to_string(points), "left", SCR_HEIGHT-50, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
         }else{
             if(points == 1000){
@@ -515,82 +514,94 @@ int main()
 }
 
 void startGame(){
-    maze = Maze();
-    maze.generateMaze();
-    maze.printMaze();
+    mazeClass = Maze();
+    mazeClass.generateMaze();
     points = 0;
 
-    ghost1 = Ghost(glm::vec3(0.0f,0.0f,0.0f), cols*rows);
-    ghost2 = Ghost(glm::vec3(cols-1,0.0f,rows-1), cols*rows);
-    ghost3 = Ghost(glm::vec3(cols-1,0.0f,0.0f), cols*rows);
-    ghost4 = Ghost(glm::vec3(0.0f,0.0f,rows-1), cols*rows);
+    blinkyGhost = Ghost(glm::vec3(0.0f,0.0f,0.0f));
+    pinkyGhost = Ghost(glm::vec3(cols-1,0.0f,rows-1));
+    inkyGhost = Ghost(glm::vec3(cols-1,0.0f,0.0f));
+    clydeGhost = Ghost(glm::vec3(0.0f,0.0f,rows-1));
 
     cameraPos   = glm::vec3(cols/2+0.5f, 0.5f,  rows/2+0.5f);
 
+    GAMEOVER = false;
 }
 
-void ghostScared(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) {
+void ghostScared(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost) {
     if(timer > 0){
         timer-=deltaTime;
-        ghost1.isScared = true;
-        ghost2.isScared = true;
-        ghost3.isScared = true;
-        ghost4.isScared = true;
+        blinkyGhost.isScared = true;
+        pinkyGhost.isScared = true;
+        inkyGhost.isScared = true;
+        clydeGhost.isScared = true;
     }
     if(timer < 0){
         timer = 0;
-        ghost1.isScared = false;
-        ghost2.isScared = false;
-        ghost3.isScared = false;
-        ghost4.isScared = false;
+        blinkyGhost.isScared = false;
+        pinkyGhost.isScared = false;
+        inkyGhost.isScared = false;
+        clydeGhost.isScared = false;
     }
 }
 
 void pickupsCollision(ALuint coinSound, ALuint powerUpSound) {
-    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin){
-        grid[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin = false;
+    if(maze[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin){
+        maze[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin = false;
         points += 10;
         alSourcePlay(coinSound);
     }
-    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet){
-        grid[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet = false;
+    if(maze[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet){
+        maze[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet = false;
         points += 10;
         timer = 5;
         alSourcePlay(powerUpSound);
         alSourcePlay(coinSound);
     }
     if(points == 1000){
-        BFS::GAMEOVER = true;
+        GAMEOVER = true;
     }
 }
 
-void ghostCollision(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4) {
-    if(floor(cameraPos.x) == floor(ghost1.position.x) && floor(cameraPos.z) == floor(ghost1.position.z)){
-        if(ghost1.isScared){
-            ghost1 = Ghost(glm::vec3(0.0f,0.0f,0.0f), cols*rows);
+void ghostCollision(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost) {
+    if(getDistance(cameraPos, blinkyGhost.position) <= 0.5f){
+        if(blinkyGhost.isScared){
+            blinkyGhost = Ghost(glm::vec3(0.0f,0.0f,0.0f));
+        }else{
+            GAMEOVER = true;
         }
     }
-    if(floor(cameraPos.x) == floor(ghost2.position.x) && floor(cameraPos.z) == floor(ghost2.position.z)){
-        if(ghost2.isScared){
-            ghost2 = Ghost(glm::vec3(cols-1,0.0f,rows-1), cols*rows);
+    if(getDistance(cameraPos, pinkyGhost.position) <= 0.5f){
+        if(pinkyGhost.isScared){
+            pinkyGhost = Ghost(glm::vec3(cols-1,0.0f,rows-1));
+        }else{
+            GAMEOVER = true;
         }
     }
-    if(floor(cameraPos.x) == floor(ghost3.position.x) && floor(cameraPos.z) == floor(ghost3.position.z)){
-        if(ghost3.isScared){
-            ghost3 = Ghost(glm::vec3(cols-1,0.0f,0.0f), cols*rows);
+    if(getDistance(cameraPos, inkyGhost.position) <= 0.5f){
+        if(inkyGhost.isScared){
+            inkyGhost = Ghost(glm::vec3(cols-1,0.0f,0.0f));
+        }else{
+            GAMEOVER = true;
         }
     }
-    if(floor(cameraPos.x) == floor(ghost4.position.x) && floor(cameraPos.z) == floor(ghost4.position.z)){
-        if(ghost4.isScared){
-            ghost4 = Ghost(glm::vec3(0.0f,0.0f,rows-1), cols*rows);
+    if(getDistance(cameraPos, clydeGhost.position) <= 0.5f){
+        if(clydeGhost.isScared){
+            clydeGhost = Ghost(glm::vec3(0.0f,0.0f,rows-1));
+        }else{
+            GAMEOVER = true;
         }
     }
+}
+
+float getDistance(glm::vec3 pos1, glm::vec3 pos2){
+    return sqrt(pow(pos1.x-(pos2.x + 0.5f),2) + pow(pos1.z-(pos2.z + 0.5f),2));
 }
 
 void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet) {
     for(int i=0; i < rows; i++){
         for(int j=0;j<cols;j++){
-            if(grid[i][j].hasCoin){
+            if(maze[i][j].hasCoin){
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
                 model = glm::scale(model, glm::vec3( 0.08f, 0.08f, 0.08f));
@@ -598,7 +609,7 @@ void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet) {
                 coin.Draw(shader);
             }
 
-            if(grid[i][j].hasPellet){
+            if(maze[i][j].hasPellet){
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
                 model = glm::scale(model, glm::vec3( 0.08f, 0.08f, 0.08f));
@@ -609,50 +620,50 @@ void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet) {
     }
 }
 
-void loadGhost(Ghost &ghost1, Ghost &ghost2, Ghost &ghost3, Ghost &ghost4,
+void loadGhost(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost,
                Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model) {
     float scale = 0.2f;
 
-    //red
+    //Blinky
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3( ghost1.position.x  + 0.5f, 0.3f, ghost1.position.z + 0.5f));
-    model = glm::rotate(model, glm::radians(ghost1.rotation), glm::vec3(0, 1.0f, 0));
+    model = glm::translate(model, glm::vec3( blinkyGhost.position.x  + 0.5f, 0.3f, blinkyGhost.position.z + 0.5f));
+    model = glm::rotate(model, glm::radians(blinkyGhost.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
     shader.setMat4("model", model);
-    if(ghost1.isScared)
+    if(blinkyGhost.isScared)
         scared.Draw(shader);
     else
         blinky.Draw(shader);
 
-    //blue
+    //Pinky
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3( ghost2.position.x + 0.5f, 0.3f, ghost2.position.z + 0.5f));
-    model = glm::rotate(model, glm::radians(ghost2.rotation), glm::vec3(0, 1.0f, 0));
+    model = glm::translate(model, glm::vec3( pinkyGhost.position.x + 0.5f, 0.3f, pinkyGhost.position.z + 0.5f));
+    model = glm::rotate(model, glm::radians(pinkyGhost.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
     shader.setMat4("model", model);
-    if(ghost2.isScared)
+    if(pinkyGhost.isScared)
         scared.Draw(shader);
     else
         pinky.Draw(shader);
 
-    //green
+    //Inky
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3( ghost3.position.x + 0.5f, 0.3f, ghost3.position.z + 0.5f));
-    model = glm::rotate(model, glm::radians(ghost3.rotation), glm::vec3(0, 1.0f, 0));
+    model = glm::translate(model, glm::vec3( inkyGhost.position.x + 0.5f, 0.3f, inkyGhost.position.z + 0.5f));
+    model = glm::rotate(model, glm::radians(inkyGhost.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
     shader.setMat4("model", model);
-    if(ghost3.isScared)
+    if(inkyGhost.isScared)
         scared.Draw(shader);
     else
         inky.Draw(shader);
 
-    //yellow
+    //Clyde
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3( ghost4.position.x + 0.5f, 0.3f, ghost4.position.z + 0.5f));
-    model = glm::rotate(model, glm::radians(ghost4.rotation), glm::vec3(0, 1.0f, 0));
+    model = glm::translate(model, glm::vec3( clydeGhost.position.x + 0.5f, 0.3f, clydeGhost.position.z + 0.5f));
+    model = glm::rotate(model, glm::radians(clydeGhost.rotation), glm::vec3(0, 1.0f, 0));
     model = glm::scale(model, glm::vec3( scale, scale, scale));
     shader.setMat4("model", model);
-    if(ghost4.isScared)
+    if(clydeGhost.isScared)
         scared.Draw(shader);
     else
         clyde.Draw(shader);
@@ -662,29 +673,29 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
     float scale = 0.132f;
     for(int i=0;i<rows;i++){
         for(int j=0;j<cols;j++){
-            if(grid[i][j].wallRight){
+            if(maze[i][j].wallLeft){
                 model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3((float)(j+1), 0.05f, (float)i+0.6f));
+                model = glm::translate(model, glm::vec3(j, 0.05f, (float)(i)+0.5f));
                 model = glm::scale(model, glm::vec3( scale, scale, scale));
                 shader.setMat4("model", model);
                 wall.Draw(shader);
             }
-            if(grid[i][j].wallLeft){
+            if(maze[i][j].wallUp){
                 model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3((float)(j), 0.05f, (float)i+0.6f));
-                model = glm::scale(model, glm::vec3( scale, scale, scale));
-                shader.setMat4("model", model);
-                wall.Draw(shader);
-            }
-            if(grid[i][j].wallUp){
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3((float)(j)+0.5f, 0.05f, (float)i+0.1));
+                model = glm::translate(model, glm::vec3((float)(j)+0.5f, 0.05f, i));
                 model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0, 1.0f, 0));
                 model = glm::scale(model, glm::vec3( scale, scale, scale));
                 shader.setMat4("model", model);
                 wall.Draw(shader);
             }
         }
+    }
+    for(int j=0;j<rows;j++){
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(rows, 0.05f, (float)(j)+0.5f));
+        model = glm::scale(model, glm::vec3( scale, scale, scale));
+        shader.setMat4("model", model);
+        wall.Draw(shader);
     }
     for(int j=0;j<cols;j++){
         model = glm::mat4(1.0f);
@@ -694,8 +705,6 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
         shader.setMat4("model", model);
         wall.Draw(shader);
     }
-
-
 }
 
 void RenderText(Shader shaderProgram,std::string text, std::string text_position_x, float y, float scale, glm::vec3 color)
@@ -771,7 +780,7 @@ void processInput(GLFWwindow *window)
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if(!BFS::GAMEOVER){
+    if(!GAMEOVER){
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             cameraPos += cameraSpeed * cameraFront * camera;
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -782,7 +791,7 @@ void processInput(GLFWwindow *window)
             cameraPos += glm::normalize(glm::cross(cameraFront * camera, cameraUp)) * cameraSpeed;
     }
 
-    if(BFS::GAMEOVER){
+    if(GAMEOVER){
         if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
         {
             startGame();
@@ -791,13 +800,13 @@ void processInput(GLFWwindow *window)
     }
 
     //wall collisions
-    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallUp && distance(cameraPos.z,glm::floor(cameraPos.z)) <= wallSize)
+    if(maze[floor(cameraPos.z)][floor(cameraPos.x)].wallUp && distance(cameraPos.z,glm::floor(cameraPos.z)) <= wallSize)
         cameraPos.z = glm::floor(cameraPos.z)+wallSize;
-    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallDown && distance(cameraPos.z,glm::floor(cameraPos.z)+1.0f) <= wallSize)
+    if(maze[floor(cameraPos.z)][floor(cameraPos.x)].wallDown && distance(cameraPos.z,glm::floor(cameraPos.z)+1.0f) <= wallSize)
         cameraPos.z = glm::floor(cameraPos.z)+1.0f-wallSize;
-    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallLeft && distance(cameraPos.x,glm::floor(cameraPos.x)) <= wallSize)
+    if(maze[floor(cameraPos.z)][floor(cameraPos.x)].wallLeft && distance(cameraPos.x,glm::floor(cameraPos.x)) <= wallSize)
         cameraPos.x = glm::floor(cameraPos.x)+wallSize;
-    if(grid[floor(cameraPos.z)][floor(cameraPos.x)].wallRight && distance(cameraPos.x,glm::floor(cameraPos.x)+1.0f) <= wallSize)
+    if(maze[floor(cameraPos.z)][floor(cameraPos.x)].wallRight && distance(cameraPos.x,glm::floor(cameraPos.x)+1.0f) <= wallSize)
         cameraPos.x = glm::floor(cameraPos.x)+1.0f-wallSize;
 }
 
