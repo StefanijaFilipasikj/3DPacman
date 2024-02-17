@@ -1,7 +1,3 @@
-//
-// Created by drist on 8/28/2023.
-//
-
 #ifndef OPENGLPRJ_GHOST_H
 #define OPENGLPRJ_GHOST_H
 #include <OpenGLPrj.hpp>
@@ -67,9 +63,8 @@ public:
                 path = vector<int>();
                 path.push_back(algorithm.getRunningPath(ghostCellPosition.x + ghostCellPosition.z*cols,dest));
             }
-
         }
     }
 };
 
-#endif //OPENGLPRJ_GHOST_H
+#endif // OPENGLPRJ_GHOST_H

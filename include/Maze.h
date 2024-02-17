@@ -1,6 +1,5 @@
 #ifndef OPENGLPRJ_MAZE_H
 #define OPENGLPRJ_MAZE_H
-
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -35,21 +34,21 @@ public:
                 maze[i][j].wallLeft = true;
                 maze[i][j].wallRight = true;
                 maze[i][j].hasCoin = true;
-                maze[i][j].hasPellet = false;
+                maze[i][j].hasPowerup = false;
             }
         }
 
-        //add pellets
-        maze[0][0].hasPellet = true;
-        maze[0][cols-1].hasPellet = true;
-        maze[rows-1][0].hasPellet = true;
-        maze[rows-1][cols-1].hasPellet = true;
-        maze[2][2].hasPellet = true;
-        maze[2][cols-3].hasPellet = true;
-        maze[rows-3][2].hasPellet = true;
-        maze[rows-3][cols-3].hasPellet = true;
+        // add powerup
+        maze[0][0].hasPowerup = true;
+        maze[0][cols-1].hasPowerup = true;
+        maze[rows-1][0].hasPowerup = true;
+        maze[rows-1][cols-1].hasPowerup = true;
+        maze[2][2].hasPowerup = true;
+        maze[2][cols-3].hasPowerup = true;
+        maze[rows-3][2].hasPowerup = true;
+        maze[rows-3][cols-3].hasPowerup = true;
 
-        //delete coins on cells that have pellets
+        // delete coins on cells that have powerups
         maze[0][0].hasCoin = false;
         maze[0][cols-1].hasCoin = false;
         maze[rows-1][0].hasCoin = false;
@@ -93,40 +92,40 @@ public:
 
     void generateMaze() {
 
-        //generate random column and row
+        // generate random column and row
         int startRow = rand() % rows;
         int startCol = rand() % cols;
 
-        //mark cell as visited
+        // mark cell as visited
         maze[startRow][startCol].visited = true;
         vector<pair<int, int>> unvisitedCells;
 
-        //add unvisited neighbors to list
+        // add unvisited neighbors to list
         if (isNotVisited(startRow - 1, startCol)) unvisitedCells.push_back(make_pair(startRow - 1, startCol));
         if (isNotVisited(startRow + 1, startCol)) unvisitedCells.push_back(make_pair(startRow + 1, startCol));
         if (isNotVisited(startRow, startCol - 1)) unvisitedCells.push_back(make_pair(startRow, startCol - 1));
         if (isNotVisited(startRow, startCol + 1)) unvisitedCells.push_back(make_pair(startRow, startCol + 1));
 
-        //loop while unvisited cells list is full
+        // loop while unvisited cells list is full
         while (!unvisitedCells.empty()) {
-            //choose a cell
+            // choose a cell
             int randomIndex = rand() % unvisitedCells.size();
             int currentRow = unvisitedCells[randomIndex].first;
             int currentCol = unvisitedCells[randomIndex].second;
             maze[currentRow][currentCol].visited = true;
 
-            //current cells neighbors
+            // current cells neighbors
             vector<pair<int, int>> neighbors;
 
-            //add all visited neighboring cells
+            // add all visited neighboring cells
             if (isVisited(currentRow - 1, currentCol)) neighbors.push_back(make_pair(currentRow - 1, currentCol));
             if (isVisited(currentRow + 1, currentCol)) neighbors.push_back(make_pair(currentRow + 1, currentCol));
             if (isVisited(currentRow, currentCol - 1)) neighbors.push_back(make_pair(currentRow, currentCol - 1));
             if (isVisited(currentRow, currentCol + 1)) neighbors.push_back(make_pair(currentRow, currentCol + 1));
 
-            //pick a random neighbor to connect to
+            // pick a random neighbor to connect to
             if (!neighbors.empty()) {
-                //randomly connect to 2 neighbors
+                // randomly connect to 2 neighbors
                 int br = rand() % 100;
                 if(br >= 30){
                     if(neighbors.size() > 1){
@@ -153,10 +152,10 @@ public:
                     addNeighbor(currentRow, currentCol, neighborRow, neighborCol);
                 }
             }
-            //erase current cell from list
+            // erase current cell from list
             unvisitedCells.erase(unvisitedCells.begin() + randomIndex);
 
-            //add all new unvisited neighbors
+            // add all new unvisited neighbors
             if (isNotVisited(currentRow - 1, currentCol) && !contains(unvisitedCells,currentRow - 1, currentCol)) unvisitedCells.push_back(make_pair(currentRow - 1, currentCol));
             if (isNotVisited(currentRow + 1, currentCol) && !contains(unvisitedCells,currentRow + 1, currentCol)) unvisitedCells.push_back(make_pair(currentRow + 1, currentCol));
             if (isNotVisited(currentRow, currentCol - 1) && !contains(unvisitedCells,currentRow, currentCol-1)) unvisitedCells.push_back(make_pair(currentRow, currentCol - 1));
@@ -165,4 +164,4 @@ public:
     }
 };
 
-#endif //OPENGLPRJ_MAZE_H
+#endif // OPENGLPRJ_MAZE_H

@@ -4,7 +4,7 @@
 class Cell{
 public:
     int row, col;
-    bool wallUp, wallDown, wallLeft, wallRight, hasCoin, hasPellet, visited;
+    bool wallUp, wallDown, wallLeft, wallRight, hasCoin, hasPowerup, visited;
 };
 
-#endif //UNTITLED2_CELL_H
+#endif // UNTITLED2_CELL_H

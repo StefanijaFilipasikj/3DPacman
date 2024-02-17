@@ -1,6 +1,5 @@
 #ifndef OPENGLPRJ_BFS_H
 #define OPENGLPRJ_BFS_H
-
 #include <stack>
 #include "Maze.h"
 using namespace std;
@@ -9,13 +8,13 @@ class BFS {
 
 private:
 
-    // Number of cells
+    // number of cells
     int V;
 
-    // Adjacency List
+    // adjacency List
     vector<vector<int> > adj;
 
-    // Get max element from list
+    // get max element from list
     int maxElement(vector<int> list){
         int max = 0;
         for(int i=1;i<list.size();i++){
@@ -26,18 +25,18 @@ private:
         return max;
     }
 
-    // Checks if row and column are inside the maze
+    // checks if row and column are inside the maze
     bool isValid(int row, int col){
         return (row >= 0 && row < rows && col >= 0 && col < cols);
     }
 
-    // Add edge to cell
+    // add edge to cell
     void addEdge(int v, int w){
         adj[v].push_back(w);
     }
 
     // this function returns if destination is reachable or not
-    // additionally it sets the parent array to say the path (if exist).
+    // additionally it sets the parent array to say the path (if exist)
     bool Run_BFS(int source, int dest, int parent[]) {
 
         queue<int> q;
@@ -61,32 +60,29 @@ private:
             int temp = q.front();
             q.pop();
 
-            // check for all adjacents.
+            // check for all adjacent
             for(int k: adj[temp]) {
                 if(visited[k] == false) {
 
                     // pushing into queue and mark it visited as well as
-                    // set the parent of the adjacent in parent array.
+                    // set the parent of the adjacent in parent array
                     q.push(k);
                     visited[k] = true;
                     parent[k] = temp;
 
-                    // if destination is reached, returns true
-                    // to state that there exist a path.
+                    // if destination is reached, returns true to indicate that a path exists
                     if(k == dest)
                         return true;
                 }
             }
         }
 
-        // if destination is not reachable.
+        // if destination is not reachable
         return false;
     }
 
 public:
-//    static bool GAMEOVER;
-
-    // Use maze from Maze.h to initialize the adjacency list
+    // use maze from Maze.h to initialize the adjacency list
     BFS(){
         this->V = rows*cols;
         adj.resize(V);
@@ -108,7 +104,7 @@ public:
         }
     }
 
-    // Used by ghosts running from pacman
+    // used by ghosts running from pacman
     int getRunningPath(int src, int pacman){
         int src_x = src % cols;
         int src_z = src / cols;
@@ -127,20 +123,20 @@ public:
         return next;
     }
 
-    // Function to get the shortest path.
+    // function to get the shortest path
     vector<int> getPath(int source, int dest) {
 
-        // It stores parent for each vertex to trace the path.
+        // it stores parent for each vertex to trace the path
         int* parent = new int[V];
 
         vector<int> path;
 
-        // BFS returns false means destination is not reachable, return empty path.
+        // BFS returns false means destination is not reachable, return empty path
         if(Run_BFS(source, dest, parent) == false) {
             return path;
         }
 
-        // Tracing the path.
+        // tracing the path
         while(parent[dest] != -1) {
             // Add to the front of the list
             path.insert(path.begin(), dest);
@@ -151,4 +147,4 @@ public:
     }
 };
 
-#endif //OPENGLPRJ_BFS_H
+#endif // OPENGLPRJ_BFS_H

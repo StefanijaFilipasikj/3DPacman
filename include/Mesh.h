@@ -1,17 +1,12 @@
 #ifndef MESH_H
 #define MESH_H
-
 #include <glad/glad.h> // holds all OpenGL type declarations
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include <Shader.h>
-
 #include <string>
 #include <vector>
 using namespace std;
-
 #define MAX_BONE_INFLUENCE 4
 
 struct Vertex {
@@ -109,8 +104,8 @@ private:
         glBindVertexArray(VAO);
         // load data into vertex buffers
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        // A great thing about structs is that their memory layout is sequential for all its items.
-        // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
+        // a great thing about structs is that their memory layout is sequential for all its items.
+        // the effect is that we can simply pass a pointer to the struct, and it translates perfectly to a glm::vec3/2 array which
         // again translates to 3/2 floats which translates to a byte array.
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
@@ -118,7 +113,7 @@ private:
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
         // set the vertex attribute pointers
-        // vertex Positions
+        // vertex positions
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
         // vertex normals
@@ -136,7 +131,6 @@ private:
         // ids
         glEnableVertexAttribArray(5);
         glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, m_BoneIDs));
-
         // weights
         glEnableVertexAttribArray(6);
         glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));

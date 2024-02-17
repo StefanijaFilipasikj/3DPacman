@@ -1,4 +1,4 @@
-# Blender 3.6.2 MTL File: 'pacman_ghost_blue.blend'
+# Blender 3.6.2 MTL File: 'pacman_wall.blend'
 # www.blender.org
 
 newmtl Material
@@ -9,9 +9,9 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd blue.png
+map_Kd material_wall_gray.png
 
-newmtl Material.004
+newmtl Material.002
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000
@@ -19,14 +19,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd Solid_white.png
-
-newmtl Material.005
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 2
-map_Kd Solid_black.png
+map_Kd material_wall_blue.png

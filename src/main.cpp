@@ -3,7 +3,6 @@
 #include <GLFW/glfw3.h>
 #include "Maze.h"
 #include "Ghost.h"
-
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -14,69 +13,67 @@
 #include <assimp/Importer.hpp>
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include FT_FREETYPE_H
-
 
 const std::string program_name = ("3D PACMAN");
 
+// declare functions
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+float distance(float x1, float x2);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void loadGhost(Ghost &ghost, Model &ghostModel, Model &scaredModel, Shader &shader);
+void loadGhosts(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost, Model &blinkyModel, Model &pinkyModel, Model &inkyModel, Model &clydeModel, Model &scaredModel, Shader &shader);
 void loadWalls(glm::mat4 &model, Shader &shader, Model &wall);
-void loadGhost(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost, Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model) ;
-void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet);
+void loadCoinsAndPowerups(glm::mat4 &model, Shader &shader, Model &coin, Model &powerup);
+void checkGhostCollision(Ghost &ghost, const glm::vec3 &resetPosition);
 void ghostCollision(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost);
-void pickupsCollision(ALuint coinSound, ALuint powerUpSound);
+void pickupsCollision(ALuint coinSound, ALuint powerupSound);
 void ghostScared(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost);
 float getDistance(glm::vec3 pos1, glm::vec3 pos2);
-void RenderText(Shader shaderProgram,std::string text, std::string text_position_x, float y, float scale, glm::vec3 color);
-float distance(float x1, float x2);
+void renderText(Shader shaderProgram,std::string text, std::string text_position_x, float y, float scale, glm::vec3 color);
 ALboolean loadWavFile(const char *path, ALenum *format, ALvoid **data, ALsizei *size, ALsizei *frequency);
 ALuint loadSound(const char* filePath, ALboolean loop);
 void startGame();
 
-// settings
+// screen resolution settings
 const unsigned int SCR_WIDTH = 985;
 const unsigned int SCR_HEIGHT = 700;
 
-glm::mat4 view = glm::mat4(1.0f);
-//position camera in the centre of the maze
+// position camera in the centre of the maze
 glm::vec3 cameraPos   = glm::vec3(cols/2+0.5f, 0.5f,  rows/2+0.5f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
+glm::mat4 view = glm::mat4(1.0f);
+
+// game classes
+Ghost blinkyGhost, pinkyGhost, inkyGhost, clydeGhost; // red, pink, blue, orange ghost
+Maze mazeClass;
+
 static bool GAMEOVER = false;
+bool gameOverSoundPlayed = false;
 int points = 0;
 float timer = 0;
 float wallSize = 0.3f;
 
-float deltaTime = 0.0f;	// Time between current frame and last frame
-float lastFrame = 0.0f; // Time of last frame
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f; // time of last frame
 
 struct Character {
-    unsigned int TextureID; // ID handle of the glyph texture
-    glm::ivec2   Size;      // Size of glyph
-    glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
-    unsigned int Advance;   // Horizontal offset to advance to next glyph
+    unsigned int TextureID; // id handle of the glyph texture
+    glm::ivec2   Size;      // size of glyph
+    glm::ivec2   Bearing;   // offset from baseline to left/top of glyph
+    unsigned int Advance;   // horizontal offset to advance to next glyph
 };
+std::map<GLchar, Character> Characters; // used for text rendering
 
-std::map<GLchar, Character> Characters;
 unsigned int VBO, VAO;
-
-//Game objects
-Ghost blinkyGhost;
-Ghost pinkyGhost;
-Ghost inkyGhost;
-Ghost clydeGhost;
-Maze mazeClass;
-
-bool gameOverSoundPlayed = false;
 
 int main()
 {
-
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -112,7 +109,9 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    Shader textShader = Shader("../../../shaders/text.vert","../../../shaders/text.frag");
+    // load vertex and fragment shaders
+    // --------------------------------
+    Shader textShader("../../../shaders/text.vert","../../../shaders/text.frag");
     Shader minimapShader("../../../shaders/minimap.vert", "../../../shaders/minimap.frag");
     Shader modelShader("../../../shaders/model_loading.vert", "../../../shaders/model_loading.frag");
     Shader lightingModelShader("../../../shaders/lighting.vert", "../../../shaders/lighting.frag");
@@ -124,7 +123,9 @@ int main()
     // FreeType
     // --------
     FT_Library ft;
-    // All functions return a value different than 0 whenever an error occurred
+
+    // all functions return a value different from 0 whenever an error occurred
+    // initialize FreeType library
     if (FT_Init_FreeType(&ft))
     {
         std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
@@ -155,33 +156,26 @@ int main()
         // load first 128 characters of ASCII set
         for (unsigned char c = 0; c < 128; c++)
         {
-            // Load character glyph
+            // load character glyph
             if (FT_Load_Char(face, c, FT_LOAD_RENDER))
             {
                 std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
                 continue;
             }
+
             // generate texture
             unsigned int texture;
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
-            glTexImage2D(
-                    GL_TEXTURE_2D,
-                    0,
-                    GL_RED,
-                    face->glyph->bitmap.width,
-                    face->glyph->bitmap.rows,
-                    0,
-                    GL_RED,
-                    GL_UNSIGNED_BYTE,
-                    face->glyph->bitmap.buffer
-            );
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+
             // set texture options
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            // now store character for later use
+
+            // store character for later use
             Character character = {
                     texture,
                     glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
@@ -192,7 +186,7 @@ int main()
         }
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    // destroy FreeType once we're finished
+    // destroy FreeType once finished
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
 
@@ -208,7 +202,8 @@ int main()
             1.0f,1.0f, 1.0f, 1.0f,
     };
 
-    //for ui text
+    // ui text
+    // -----------
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -219,7 +214,8 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    //for minimap
+    // minimap
+    // -----------
     unsigned int quadVAO, quadVBO;
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
@@ -231,11 +227,12 @@ int main()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-    //create frame buffer for minimap
+    // frame buffer for minimap
     GLuint fbo;
     glGenFramebuffersEXT(1, &fbo);
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-    //create texture for minimap
+
+    // texture for minimap
     GLuint img;
     glGenTextures(1, &img);
     glBindTexture(GL_TEXTURE_2D, img);
@@ -246,52 +243,41 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, img, 0);
-    //create render buffer for minimap
-    GLuint depthbuffer;
-    glGenRenderbuffersEXT(1, &depthbuffer);
-    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthbuffer);
-    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, SCR_WIDTH, SCR_HEIGHT);
-    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthbuffer);
 
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-    //hide the cursor
+    // hide the cursor
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    Model floor("../../../blender objects/colliders/pacman_floor.obj");
-    Model wall("../../../blender objects/colliders/pacman_wall.obj");
-    Model coin("../../../blender objects/pickups/pacman_ball.obj");
-    Model pellet("../../../blender objects/pickups/pacman_powerup.obj");
+    // load blender models
+    // -------------------
+    Model floor("../../../blender-objects/colliders/pacman_floor.obj");
+    Model wall("../../../blender-objects/colliders/pacman_wall.obj");
+    Model coin("../../../blender-objects/pickups/pacman_coin.obj");
+    Model powerup("../../../blender-objects/pickups/pacman_powerup.obj");
 
-    Model pacman("../../../blender objects/ghosts/player.obj");
-    Model blinky("../../../blender objects/ghosts/pacman_ghost_red.obj");
-    Model pinky("../../../blender objects/ghosts/pacman_ghost_pink.obj");
-    Model inky("../../../blender objects/ghosts/pacman_ghost_blue.obj");
-    Model clyde("../../../blender objects/ghosts/pacman_ghost_orange.obj");
-    Model scaredGhost("../../../blender objects/ghosts/pacman_ghost_scared.obj");
-
+    Model pacman("../../../blender-objects/ghosts/player.obj");
+    Model blinky("../../../blender-objects/ghosts/pacman_ghost_red.obj");
+    Model pinky("../../../blender-objects/ghosts/pacman_ghost_pink.obj");
+    Model inky("../../../blender-objects/ghosts/pacman_ghost_blue.obj");
+    Model clyde("../../../blender-objects/ghosts/pacman_ghost_orange.obj");
+    Model scaredGhost("../../../blender-objects/ghosts/pacman_ghost_scared.obj");
 
     // OpenAL initialization
+    // ---------------------
     ALCdevice *device = alcOpenDevice(NULL);
     ALCcontext *context = alcCreateContext(device, NULL);
     alcMakeContextCurrent(context);
 
-    //play game theme
+    // load and play game theme (looped)
     ALuint gameThemeSource = loadSound("../../../sounds/sound-game-theme.wav", AL_TRUE);
     alSourcePlay(gameThemeSource);
 
-    //load coin sound
-    ALuint coinSound = loadSound("../../../sounds/sound-effect-coin.wav", AL_FALSE);
-
-    //load powerUp sound
-    ALuint powerUpSound = loadSound("../../../sounds/sound-effect-power-up.wav", AL_FALSE);
-
-    //load game over - win sound
-    ALuint gameOverSoundWin = loadSound("../../../sounds/sound-effect-game-win.wav", AL_FALSE);
-
-    //load game over - loss sound
-    ALuint gameOverSoundLoss = loadSound("../../../sounds/sound-effect-game-over.wav", AL_FALSE);
-
+    // load other sounds for later: coin, powerup, win, loss
+    ALuint coinSound = loadSound("../../../sounds/sound-effect-consume-coin.wav", AL_FALSE);
+    ALuint powerupSound = loadSound("../../../sounds/sound-effect-consume-powerup.wav", AL_FALSE);
+    ALuint gameOverSoundWin = loadSound("../../../sounds/sound-effect-game-over-win.wav", AL_FALSE);
+    ALuint gameOverSoundLoss = loadSound("../../../sounds/sound-effect-game-over-loss.wav", AL_FALSE);
 
     startGame();
 
@@ -305,7 +291,8 @@ int main()
 
         processInput(window);
 
-        //FIRST RENDER
+        // FIRST RENDER
+        // ------------
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
         glEnable(GL_DEPTH_TEST);
 
@@ -314,78 +301,59 @@ int main()
 
         glm::mat4 model = glm::mat4(1.0f);
 
-        //cameraPos + cameraFront
-        glm::vec3 mCameraPos;
-        float offset;
-        if(SCR_WIDTH < SCR_HEIGHT){
-            mCameraPos = glm::vec3(5.0f, 16.0f, 5.0f);
-        }else{
-            mCameraPos = glm::vec3(5.0f, 13.0f, 5.0f);
-        }
+        // camera for minimap
+        glm::vec3 mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+        glm::vec3 mCameraPos = glm::vec3(5.0f, 13.0f, 5.0f);
+        if(SCR_WIDTH < SCR_HEIGHT)
+            mCameraPos = glm::vec3(5.0f, 16.0f, 5.0f); // a little more zoomed out if portrait
 
-        glm::vec3 mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);;
+        // view and projection for minimap
         glm::mat4 view2 = glm::lookAt(mCameraPos, mCameraFront + mCameraPos, cameraUp);
-
-        glm::mat4 projection2;
-        projection2 = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection2 = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
         projection2 = glm::rotate(projection2, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-        // retrieve the matrix uniform locations
-        // pass them to the shaders (3 different ways)
+        // load floor for minimap
         lightingModelShader.use();
         lightingModelShader.setMat4("model", model);
         lightingModelShader.setMat4("view", view2);
         lightingModelShader.setMat4("projection", projection2);
-
         floor.Draw(lightingModelShader);
 
+        // load models for minimap
         modelShader.use();
         modelShader.setMat4("model", model);
         modelShader.setMat4("view", view2);
         modelShader.setMat4("projection", projection2);
 
-        //load player
+        // load player (pacman) behind camera
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(cameraPos.x, 1.0f, cameraPos.z));
         model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
         modelShader.setMat4("model", model);
         pacman.Draw(modelShader);
 
-        //load walls
+        // load walls, ghosts, coins & powerups
         loadWalls(model, modelShader, wall);
-
-        //load ghost
-        loadGhost(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost,
-                  blinky, pinky, inky, clyde, scaredGhost, modelShader, model);
-
-        //load coins
-        loadCoins(model, modelShader, coin, pellet);
+        loadGhosts(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost,blinky, pinky, inky, clyde, scaredGhost, modelShader);
+        loadCoinsAndPowerups(model, modelShader, coin, powerup);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-        //FIRST RENDER END
 
-
-        //SECOND RENDER
+        // SECOND RENDER
+        // -------------
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        lightingModelShader.use();
 
         model = glm::mat4(1.0f);
-
         view = glm::lookAt(cameraPos, cameraFront + cameraPos, cameraUp);
         projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
 
+        // lighting
         lightingModelShader.use();
-
-        // pass them to the shaders (3 different ways)
         lightingModelShader.setMat4("model", model);
         lightingModelShader.setMat4("view", view);
         lightingModelShader.setMat4("projection", projection);
-
-
-        //lighting
-        lightingModelShader.use();
         lightingModelShader.setVec3("viewPos", cameraPos);
         lightingModelShader.setFloat("material.shininess", 32.0f);
 
@@ -404,11 +372,10 @@ int main()
                     lightingModelShader.setFloat("pointLights["+std::to_string(i*10+j)+"].linear", 0.0f);
                     lightingModelShader.setFloat("pointLights["+std::to_string(i*10+j)+"].quadratic", 0.0f);
                 }
-
             }
         }
 
-        // spotLight
+        // spotlight
         lightingModelShader.setVec3("spotLight.position", cameraPos);
         lightingModelShader.setVec3("spotLight.direction", cameraFront);
         lightingModelShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
@@ -422,47 +389,44 @@ int main()
 
         floor.Draw(lightingModelShader);
 
-        //load walls
+        // load walls
         loadWalls(model, lightingModelShader, wall);
 
-        //load ghost
+        // load ghosts
         modelShader.use();
         modelShader.setMat4("model", model);
         modelShader.setMat4("view", view);
         modelShader.setMat4("projection", projection);
-
         if(!GAMEOVER){
             blinkyGhost.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
             pinkyGhost.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
             inkyGhost.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
             clydeGhost.move(deltaTime, std::floor(cameraPos.x) + std::floor(cameraPos.z) * cols);
         }
+        loadGhosts(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost, blinky, pinky, inky, clyde, scaredGhost, modelShader);
 
-        loadGhost(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost,
-                  blinky, pinky, inky, clyde, scaredGhost, modelShader, model);
+        // load coins
+        loadCoinsAndPowerups(model, modelShader, coin, powerup);
 
-        //load coins
-        loadCoins(model, modelShader, coin, pellet);
-
-        lightingModelShader.use();
         ghostScared(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost);
-        pickupsCollision(coinSound, powerUpSound);
+        pickupsCollision(coinSound, powerupSound);
         ghostCollision(blinkyGhost, pinkyGhost, inkyGhost, clydeGhost);
 
+        // render text
         if(!GAMEOVER){
-            RenderText(textShader, "Points: "+ to_string(points), "left", SCR_HEIGHT-50, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
+            renderText(textShader, "Points: "+ to_string(points), "left", SCR_HEIGHT-50, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
         }else{
-            if(points == 1000){
-                RenderText(textShader, "CONGRATS", "center", int(SCR_HEIGHT/1.8), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
-                RenderText(textShader, "YOU WON!", "center", int(SCR_HEIGHT/2.5), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
+            if(points == 1000){ // all coins and powerups are collected, you win
+                renderText(textShader, "CONGRATS", "center", int(SCR_HEIGHT/1.8), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
+                renderText(textShader, "YOU WON!", "center", int(SCR_HEIGHT/2.5), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
 
                 if(!gameOverSoundPlayed){
                     alSourcePlay(gameOverSoundWin);
                     gameOverSoundPlayed = true;
                 }
-            }else{
-                RenderText(textShader, "GAME OVER", "center", int(SCR_HEIGHT/1.8), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
-                RenderText(textShader, "PRESS ENTER TO RESTART", "center", int(SCR_HEIGHT/2.5), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
+            }else{ // a ghost is at the same position as you, you loose
+                renderText(textShader, "GAME OVER", "center", int(SCR_HEIGHT/1.8), 2.0f, glm::vec3(1.0, 1.0f, 1.0f));
+                renderText(textShader, "PRESS ENTER TO RESTART", "center", int(SCR_HEIGHT/2.5), 1.5f, glm::vec3(1.0, 1.0f, 1.0f));
 
                 if(!gameOverSoundPlayed){
                     alSourcePlay(gameOverSoundLoss);
@@ -471,25 +435,23 @@ int main()
             }
         }
 
-        //MINIMAP
+        // minimap
         glDisable(GL_DEPTH_TEST);
         glBindTexture(GL_TEXTURE_2D, img);
+        // if screen is in portrait, offset y-axis to get a square appearance of minimap, if it's landscape offset x-axis
         minimapShader.use();
-
         if(SCR_WIDTH < SCR_HEIGHT){
-            offset = (1.0 / ((float)SCR_HEIGHT/(float)SCR_WIDTH) - 1.0) / 2.0;
+            float offset = (1.0 / ((float)SCR_HEIGHT/(float)SCR_WIDTH) - 1.0) / 2.0;
             minimapShader.setFloat("offset_x",  0.0f);
             minimapShader.setFloat("offset_y",  offset);
         }else{
-            offset = (1.0 / ((float)SCR_WIDTH/(float)SCR_HEIGHT) - 1.0) / 2.0;
+            float offset = (1.0 / ((float)SCR_WIDTH/(float)SCR_HEIGHT) - 1.0) / 2.0;
             minimapShader.setFloat("offset_x",  offset);
             minimapShader.setFloat("offset_y",  0.0f);
         }
 
         glBindVertexArray(quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        //SECOND RENDER END
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -505,7 +467,6 @@ int main()
     glDeleteBuffers(1, &VBO);
     glDeleteFramebuffersEXT(1, &fbo);
     glDeleteTextures(1, &img);
-    glDeleteRenderbuffers(1, &depthbuffer);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -516,6 +477,7 @@ int main()
 void startGame(){
     mazeClass = Maze();
     mazeClass.generateMaze();
+    GAMEOVER = false;
     points = 0;
 
     blinkyGhost = Ghost(glm::vec3(0.0f,0.0f,0.0f));
@@ -524,81 +486,69 @@ void startGame(){
     clydeGhost = Ghost(glm::vec3(0.0f,0.0f,rows-1));
 
     cameraPos   = glm::vec3(cols/2+0.5f, 0.5f,  rows/2+0.5f);
-
-    GAMEOVER = false;
 }
 
 void ghostScared(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost) {
+    std::vector<std::reference_wrapper<Ghost>> ghosts = {std::ref(blinkyGhost), std::ref(pinkyGhost), std::ref(inkyGhost), std::ref(clydeGhost)};
+
+    // if the timer is greater than 0, it indicated that the ghosts are scared
     if(timer > 0){
         timer-=deltaTime;
-        blinkyGhost.isScared = true;
-        pinkyGhost.isScared = true;
-        inkyGhost.isScared = true;
-        clydeGhost.isScared = true;
+        for (Ghost &ghost : ghosts)
+            ghost.isScared = true;
     }
     if(timer < 0){
         timer = 0;
-        blinkyGhost.isScared = false;
-        pinkyGhost.isScared = false;
-        inkyGhost.isScared = false;
-        clydeGhost.isScared = false;
+        for (Ghost &ghost : ghosts)
+            ghost.isScared = false;
     }
 }
 
-void pickupsCollision(ALuint coinSound, ALuint powerUpSound) {
+void pickupsCollision(ALuint coinSound, ALuint powerupSound) {
+    // if the current maze cell has a coin add 10 points and play sound
     if(maze[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin){
         maze[floor(cameraPos.z)][floor(cameraPos.x)].hasCoin = false;
         points += 10;
         alSourcePlay(coinSound);
     }
-    if(maze[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet){
-        maze[floor(cameraPos.z)][floor(cameraPos.x)].hasPellet = false;
+    // if the current maze cell has a powerup add 10 points, start the timer (for scared ghosts) and play sound
+    if(maze[floor(cameraPos.z)][floor(cameraPos.x)].hasPowerup){
+        maze[floor(cameraPos.z)][floor(cameraPos.x)].hasPowerup = false;
         points += 10;
         timer = 5;
-        alSourcePlay(powerUpSound);
-        alSourcePlay(coinSound);
+        alSourcePlay(powerupSound);
     }
+    // if 1000 points are collected, the game is over, the player won
     if(points == 1000){
         GAMEOVER = true;
     }
 }
 
+void checkGhostCollision(Ghost &ghost, const glm::vec3 &resetPosition) {
+    // check if a ghost is at the same spot as pacman
+    if (getDistance(cameraPos, ghost.position) <= 0.5f) {
+        if (ghost.isScared) {
+            ghost = Ghost(resetPosition);
+        } else {
+            GAMEOVER = true; // if not scared, the game is over, the player lost
+        }
+    }
+}
+
 void ghostCollision(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost) {
-    if(getDistance(cameraPos, blinkyGhost.position) <= 0.5f){
-        if(blinkyGhost.isScared){
-            blinkyGhost = Ghost(glm::vec3(0.0f,0.0f,0.0f));
-        }else{
-            GAMEOVER = true;
-        }
-    }
-    if(getDistance(cameraPos, pinkyGhost.position) <= 0.5f){
-        if(pinkyGhost.isScared){
-            pinkyGhost = Ghost(glm::vec3(cols-1,0.0f,rows-1));
-        }else{
-            GAMEOVER = true;
-        }
-    }
-    if(getDistance(cameraPos, inkyGhost.position) <= 0.5f){
-        if(inkyGhost.isScared){
-            inkyGhost = Ghost(glm::vec3(cols-1,0.0f,0.0f));
-        }else{
-            GAMEOVER = true;
-        }
-    }
-    if(getDistance(cameraPos, clydeGhost.position) <= 0.5f){
-        if(clydeGhost.isScared){
-            clydeGhost = Ghost(glm::vec3(0.0f,0.0f,rows-1));
-        }else{
-            GAMEOVER = true;
-        }
-    }
+    checkGhostCollision(blinkyGhost, glm::vec3(0.0f, 0.0f, 0.0f));
+    checkGhostCollision(pinkyGhost, glm::vec3(cols - 1, 0.0f, rows - 1));
+    checkGhostCollision(inkyGhost, glm::vec3(cols - 1, 0.0f, 0.0f));
+    checkGhostCollision(clydeGhost, glm::vec3(0.0f, 0.0f, rows - 1));
 }
 
 float getDistance(glm::vec3 pos1, glm::vec3 pos2){
+    // calculate Euclidean distance between two points
     return sqrt(pow(pos1.x-(pos2.x + 0.5f),2) + pow(pos1.z-(pos2.z + 0.5f),2));
 }
 
-void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet) {
+void loadCoinsAndPowerups(glm::mat4 &model, Shader &shader, Model &coin, Model &powerup) {
+   // iterate through maze cells, check if the current cell has a coin or powerup, position, scale and draw it
     for(int i=0; i < rows; i++){
         for(int j=0;j<cols;j++){
             if(maze[i][j].hasCoin){
@@ -608,71 +558,48 @@ void loadCoins(glm::mat4 &model, Shader &shader, Model &coin, Model &pellet) {
                 shader.setMat4("model", model);
                 coin.Draw(shader);
             }
-
-            if(maze[i][j].hasPellet){
+            if(maze[i][j].hasPowerup){
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3( j + 0.5f, 0.1f, i + 0.5f));
                 model = glm::scale(model, glm::vec3( 0.08f, 0.08f, 0.08f));
                 shader.setMat4("model", model);
-                pellet.Draw(shader);
+                powerup.Draw(shader);
             }
         }
     }
 }
 
-void loadGhost(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost,
-               Model &blinky, Model &pinky, Model &inky, Model &clyde, Model &scared, Shader &shader, glm::mat4 &model) {
-    float scale = 0.2f;
+void loadGhost(Ghost &ghost, Model &ghostModel, Model &scaredModel, Shader &shader) {
 
-    //Blinky
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3( blinkyGhost.position.x  + 0.5f, 0.3f, blinkyGhost.position.z + 0.5f));
-    model = glm::rotate(model, glm::radians(blinkyGhost.rotation), glm::vec3(0, 1.0f, 0));
-    model = glm::scale(model, glm::vec3( scale, scale, scale));
+    //scale, translate and rotate the model
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3( ghost.position.x  + 0.5f, 0.3f, ghost.position.z + 0.5f));
+    model = glm::rotate(model, glm::radians(ghost.rotation), glm::vec3(0, 1.0f, 0));
+    model = glm::scale(model, glm::vec3( 0.2f, 0.2f, 0.2f));
     shader.setMat4("model", model);
-    if(blinkyGhost.isScared)
-        scared.Draw(shader);
-    else
-        blinky.Draw(shader);
 
-    //Pinky
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3( pinkyGhost.position.x + 0.5f, 0.3f, pinkyGhost.position.z + 0.5f));
-    model = glm::rotate(model, glm::radians(pinkyGhost.rotation), glm::vec3(0, 1.0f, 0));
-    model = glm::scale(model, glm::vec3( scale, scale, scale));
-    shader.setMat4("model", model);
-    if(pinkyGhost.isScared)
-        scared.Draw(shader);
+    // if scared draw the scaredModel, otherwise draw the regular ghost model (blinky, pinky, inky or clyde)
+    if (ghost.isScared)
+        scaredModel.Draw(shader);
     else
-        pinky.Draw(shader);
+        ghostModel.Draw(shader);
+}
 
-    //Inky
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3( inkyGhost.position.x + 0.5f, 0.3f, inkyGhost.position.z + 0.5f));
-    model = glm::rotate(model, glm::radians(inkyGhost.rotation), glm::vec3(0, 1.0f, 0));
-    model = glm::scale(model, glm::vec3( scale, scale, scale));
-    shader.setMat4("model", model);
-    if(inkyGhost.isScared)
-        scared.Draw(shader);
-    else
-        inky.Draw(shader);
-
-    //Clyde
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3( clydeGhost.position.x + 0.5f, 0.3f, clydeGhost.position.z + 0.5f));
-    model = glm::rotate(model, glm::radians(clydeGhost.rotation), glm::vec3(0, 1.0f, 0));
-    model = glm::scale(model, glm::vec3( scale, scale, scale));
-    shader.setMat4("model", model);
-    if(clydeGhost.isScared)
-        scared.Draw(shader);
-    else
-        clyde.Draw(shader);
+void loadGhosts(Ghost &blinkyGhost, Ghost &pinkyGhost, Ghost &inkyGhost, Ghost &clydeGhost,Model &blinkyModel,
+                Model &pinkyModel, Model &inkyModel, Model &clydeModel, Model &scaredModel, Shader &shader) {
+    loadGhost(blinkyGhost, blinkyModel, scaredModel, shader);
+    loadGhost(pinkyGhost, pinkyModel, scaredModel, shader);
+    loadGhost(inkyGhost, inkyModel, scaredModel, shader);
+    loadGhost(clydeGhost, clydeModel, scaredModel, shader);
 }
 
 void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
     float scale = 0.132f;
+
+    // iterate through each cell in the maze
     for(int i=0;i<rows;i++){
         for(int j=0;j<cols;j++){
+            // draw left wall for each cell if wall exists
             if(maze[i][j].wallLeft){
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3(j, 0.05f, (float)(i)+0.5f));
@@ -680,6 +607,7 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
                 shader.setMat4("model", model);
                 wall.Draw(shader);
             }
+            // draw top wall for each cell if wall exists
             if(maze[i][j].wallUp){
                 model = glm::mat4(1.0f);
                 model = glm::translate(model, glm::vec3((float)(j)+0.5f, 0.05f, i));
@@ -690,6 +618,7 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
             }
         }
     }
+    // for each cell in the last column, draw right wall
     for(int j=0;j<rows;j++){
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(rows, 0.05f, (float)(j)+0.5f));
@@ -697,6 +626,7 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
         shader.setMat4("model", model);
         wall.Draw(shader);
     }
+    // for each cell in the last row, draw bottom wall
     for(int j=0;j<cols;j++){
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3((float)(j)+0.5f, 0.05f, rows));
@@ -707,43 +637,40 @@ void loadWalls(glm::mat4 &model, Shader &shader, Model &wall) {
     }
 }
 
-void RenderText(Shader shaderProgram,std::string text, std::string text_position_x, float y, float scale, glm::vec3 color)
+void renderText(Shader shaderProgram,std::string text, std::string text_position_x, float y, float scale, glm::vec3 color)
 {
-    // activate corresponding render state
     shaderProgram.use();
     glUniform3f(glGetUniformLocation(shaderProgram.ID, "textColor"), color.x, color.y, color.z);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
+    std::string::const_iterator c;
     scale = scale * (SCR_WIDTH / 1000.0f);
     float x;
-
-    // iterate through all characters
-    std::string::const_iterator c;
 
     if(text_position_x == "center")
     {
         float text_width = 0.0f;
-        for (c = text.begin(); c != text.end(); c++)
-        {
-            Character ch = Characters[*c];
+        for (char c : text){
+            Character ch = Characters[c];
             text_width += (ch.Advance >> 6) * scale;
         }
+        // starting point of text should be half of the screen width minus half of the text width for it to be centered
         x = SCR_WIDTH/2.0f - text_width/2.0f;
-    }else{
-        //text_position_x == left
+
+    }else{ //text_position_x == left
         x = 1.0f;
     }
 
-    for (c = text.begin(); c != text.end(); c++)
-    {
-        Character ch = Characters[*c];
+    for (char c : text){
+        Character ch = Characters[c];
 
         float xpos = x + ch.Bearing.x * scale;
         float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
 
         float w = ch.Size.x * scale;
         float h = ch.Size.y * scale;
+
         // update VBO for each character
         float vertices[6][4] = {
                 { xpos,     ypos + h,   0.0f, 0.0f },
@@ -756,30 +683,98 @@ void RenderText(Shader shaderProgram,std::string text, std::string text_position
         };
         // render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+
         // update content of VBO memory
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
-
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+
         // render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+
+        // advance cursors for next glyph
+        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+ALboolean loadWavFile(const char *path, ALenum *format, ALvoid **data, ALsizei *size, ALsizei *frequency) {
+    // open the file in binary read mode ("rb").
+    FILE *file = fopen(path, "rb");
+    if (!file) {
+        fprintf(stderr, "Failed to open file: %s\n", path);
+        return AL_FALSE;
+    }
+
+    // determine the size of a file
+    fseek(file, 0, SEEK_END);
+    *size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // allocate dynamic memory to store the contents of the file
+    *data = malloc(*size);
+    if (!*data) {
+        fprintf(stderr, "Failed to allocate memory for file data\n");
+        fclose(file);
+        return AL_FALSE;
+    }
+
+    // read the data from the file into the previously allocated memory block
+    fread(*data, 1, *size, file);
+    fclose(file);
+
+    // assume a mono, 16-bit PCM WAV file for simplicity
+    *format = AL_FORMAT_MONO16;
+    *frequency = 44100;
+
+    return AL_TRUE;
+}
+
+ALuint loadSound(const char* filePath, ALboolean loop)
+{
+    ALuint soundBuffer, soundSource;
+    ALsizei soundSize, soundFrequency;
+    ALenum soundFormat;
+    ALvoid* soundData;
+
+    // try loading the file using the loadWavFile function
+    if (!loadWavFile(filePath, &soundFormat, &soundData, &soundSize, &soundFrequency)) {
+        fprintf(stderr, "Failed to load sound WAV file: %s\n", filePath);
+        return 0;
+    }
+
+    // generate sound buffer
+    alGenBuffers(1, &soundBuffer);
+    alBufferData(soundBuffer, soundFormat, soundData, soundSize, soundFrequency);
+
+    // generate sound source
+    alGenSources(1, &soundSource);
+    alSourcei(soundSource, AL_BUFFER, soundBuffer);
+
+    // set looping property
+    alSourcei(soundSource, AL_LOOPING, loop);
+
+    // clean up loaded data
+    free(soundData);
+
+    return soundSource;
+}
+
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-
 void processInput(GLFWwindow *window)
 {
+    // camera movement speed scaled by deltaTime for smooth movement
     float cameraSpeed = 4.0f * deltaTime;
+
     glm::vec3 camera = glm::vec3(1.0f, 0.0f,  1.0f);
 
+    // close the application when ESC key is pressed
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    // if game is not over, move camera based on key presses
     if(!GAMEOVER){
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             cameraPos += cameraSpeed * cameraFront * camera;
@@ -789,9 +784,8 @@ void processInput(GLFWwindow *window)
             cameraPos -= glm::normalize(glm::cross(cameraFront * camera, cameraUp)) * cameraSpeed;
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             cameraPos += glm::normalize(glm::cross(cameraFront * camera, cameraUp)) * cameraSpeed;
-    }
-
-    if(GAMEOVER){
+    }else{
+        // if game is over and enter is pressed, restart game
         if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
         {
             startGame();
@@ -799,7 +793,7 @@ void processInput(GLFWwindow *window)
         }
     }
 
-    //wall collisions
+    // wall collisions to prevent the camera from moving through walls
     if(maze[floor(cameraPos.z)][floor(cameraPos.x)].wallUp && distance(cameraPos.z,glm::floor(cameraPos.z)) <= wallSize)
         cameraPos.z = glm::floor(cameraPos.z)+wallSize;
     if(maze[floor(cameraPos.z)][floor(cameraPos.x)].wallDown && distance(cameraPos.z,glm::floor(cameraPos.z)+1.0f) <= wallSize)
@@ -810,73 +804,15 @@ void processInput(GLFWwindow *window)
         cameraPos.x = glm::floor(cameraPos.x)+1.0f-wallSize;
 }
 
-ALboolean loadWavFile(const char *path, ALenum *format, ALvoid **data, ALsizei *size, ALsizei *frequency) {
-    FILE *file = fopen(path, "rb");
-    if (!file) {
-        fprintf(stderr, "Failed to open file: %s\n", path);
-        return AL_FALSE;
-    }
-
-    fseek(file, 0, SEEK_END);
-    *size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    *data = malloc(*size);
-    if (!*data) {
-        fprintf(stderr, "Failed to allocate memory for file data\n");
-        fclose(file);
-        return AL_FALSE;
-    }
-
-    fread(*data, 1, *size, file);
-    fclose(file);
-
-    // Assume a mono, 16-bit PCM WAV file for simplicity
-    *format = AL_FORMAT_MONO16;
-    *frequency = 44100;
-
-    return AL_TRUE;
-}
-
-ALuint loadSound(const char* filePath, ALboolean loop)
+float distance(float x1, float x2)
 {
-    ALuint soundBuffer, soundSource;
-
-    // Load WAV file
-    ALenum soundFormat;
-    ALvoid* soundData;
-    ALsizei soundSize;
-    ALsizei soundFrequency;
-
-    if (!loadWavFile(filePath, &soundFormat, &soundData, &soundSize, &soundFrequency)) {
-        fprintf(stderr, "Failed to load sound WAV file: %s\n", filePath);
-        return 0;
-    }
-
-    // Generate sound buffer
-    alGenBuffers(1, &soundBuffer);
-    alBufferData(soundBuffer, soundFormat, soundData, soundSize, soundFrequency);
-
-    // Generate sound source
-    alGenSources(1, &soundSource);
-    alSourcei(soundSource, AL_BUFFER, soundBuffer);
-
-    // Set looping property
-    alSourcei(soundSource, AL_LOOPING, loop);
-
-    // Clean up loaded data
-    free(soundData);
-
-    return soundSource;
+    return glm::abs(x1-x2);
 }
-
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
 
@@ -916,9 +852,4 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     cameraFront = glm::normalize(direction);
-}
-
-float distance(float x1, float x2)
-{
-    return glm::abs(x1-x2);
 }

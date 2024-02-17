@@ -1,6 +1,6 @@
 # Blender 3.6.2
 # www.blender.org
-mtllib pacman_ball.mtl
+mtllib pacman_coin.mtl
 o Sphere
 v 0.000000 0.826144 -0.548476
 v 0.000000 0.552012 -0.820853
