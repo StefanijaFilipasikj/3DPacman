@@ -126,8 +126,8 @@ public:
             // pick a random neighbor to connect to
             if (!neighbors.empty()) {
                 // randomly connect to 2 neighbors
-                int br = rand() % 100;
-                if(br >= 30){
+                int random = rand() % 100;
+                if(random >= 30){
                     if(neighbors.size() > 1){
                         for(int i=0;i<2;i++){
                             int randomNeighborIndex = rand() % neighbors.size();
