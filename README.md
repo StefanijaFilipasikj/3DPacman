@@ -32,4 +32,5 @@ Reach 1000 points to secure victory. Be cautious not to get caught by the ghosts
 4. Compile and run the game using your preferred development environment
 
 ## Demo
-https://github.com/StefanijaFilipasikj/3DPacman/assets/127665193/dfd17980-36de-4a73-abcb-b35b97b4039f
+
+https://github.com/StefanijaFilipasikj/3DPacman/assets/127665193/4422a37e-9436-4de7-8eea-c65ad009c9fc
